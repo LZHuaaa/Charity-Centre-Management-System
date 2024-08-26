@@ -4,15 +4,14 @@
  */
 package entity;
 
-import java.io.Serializable;
 
 /**
  *
  * @author leezh
  */
-public class DonatedItem implements Serializable {
+public class DonatedItem {
 
-   //private static final long serialVersionUID = 1L;
+   
     private String name;
     private int quantity;
 

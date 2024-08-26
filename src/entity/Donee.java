@@ -4,7 +4,7 @@
  */
 package entity;
 
-import java.io.Serializable;
+
 import java.util.Objects;
 import adt.*;
 import dao.*;
@@ -14,9 +14,8 @@ import control.*;
  *
  * @author leezh
  */
-public class Donee implements Serializable {
-
-   //private static final long serialVersionUID = 1L;
+public class Donee {
+    
     private String id;
     private String name;
     private String type;

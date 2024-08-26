@@ -1,11 +1,10 @@
 package entity;
 
 import adt.*;
-import java.io.Serializable;
 
-public class Donation implements Serializable {
 
-    //private static final long serialVersionUID = 1L;
+public class Donation  {
+
     private String description;
     private double cashAmount;
     private ListInterface<DonatedItem> items;
