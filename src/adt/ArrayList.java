@@ -8,9 +8,9 @@ package adt;
  *
  * @author leezh
  */
-import java.io.Serializable;
 
-public class ArrayList<T> implements ListInterface<T>, Serializable {
+
+public class ArrayList<T> implements ListInterface<T> {
 
     private T[] array ;
     private int size = 0;
