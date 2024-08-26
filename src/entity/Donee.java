@@ -14,24 +14,21 @@ import control.*;
  *
  * @author leezh
  */
-public class Donee implements Serializable{
+public class Donee implements Serializable {
 
+   //private static final long serialVersionUID = 1L;
     private String id;
     private String name;
-    private String type; 
-    private String contactInfo;
-    private ArrayList<Donation> donations; 
-    
-    private doneeMaintenance doneeMaintenance1 = new doneeMaintenance();
+    private String type;
+    private String contactNo;
+    private ArrayList<Donation> donations;
 
-    
-    public Donee(String id,String name, String type, String contactInfo) {
-        
-        
+    public Donee(String id, String name, String type, String contactNo) {
+
         this.id = id;
         this.name = name;
         this.type = type;
-        this.contactInfo = contactInfo;
+        this.contactNo = contactNo;
         this.donations = new ArrayList<>();
     }
 
@@ -60,12 +57,12 @@ public class Donee implements Serializable{
         this.type = type;
     }
 
-    public String getContactInfo() {
-        return contactInfo;
+    public String getContactNo() {
+        return contactNo;
     }
 
-    public void setContactInfo(String contactInfo) {
-        this.contactInfo = contactInfo;
+    public void setContactNo(String contactNo) {
+        this.contactNo = contactNo;
     }
 
     public ArrayList<Donation> getDonations() {
@@ -88,7 +85,7 @@ public class Donee implements Serializable{
     public void updateDonation(Donation oldDonation, Donation newDonation) {
         int index = -1;
         for (int i = 0; i < donations.size(); i++) {
-            if (donations.get(i).equals(oldDonation)) {
+            if (donations.getEntry(i).equals(oldDonation)) {
                 index = i;
                 break;
             }
@@ -105,7 +102,7 @@ public class Donee implements Serializable{
                 + "id='" + id + '\''
                 + ", name='" + name + '\''
                 + ", type='" + type + '\''
-                + ", contactInfo='" + contactInfo + '\''
+                + ", contactInfo='" + contactNo + '\''
                 + ", donations=" + donations
                 + '}';
     }

@@ -1,0 +1,5 @@
+DE001,helping purpose,25.0
+DE003,helping others,500.0
+    toy,25
+    doll,50
+DE003,what,400.0

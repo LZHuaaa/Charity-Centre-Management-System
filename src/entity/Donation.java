@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 public class Donation implements Serializable {
 
+    //private static final long serialVersionUID = 1L;
     private String description;
     private double cashAmount;
     private ListInterface<DonatedItem> items;
@@ -14,6 +15,14 @@ public class Donation implements Serializable {
         this.description = description;
         this.cashAmount = cashAmount;
         this.items = new ArrayList<>();
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String desc) {
+        this.description = desc;
     }
 
     public double getCashAmount() {
@@ -35,9 +44,10 @@ public class Donation implements Serializable {
     @Override
     public String toString() {
         return "Donation{"
-                + ", description=" + description
+                + "description='" + description + '\''
                 + ", cashAmount=" + cashAmount
                 + ", items=" + items
                 + '}';
     }
+
 }

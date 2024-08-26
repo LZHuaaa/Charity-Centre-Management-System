@@ -12,16 +12,15 @@ import java.io.Serializable;
  */
 public class DonatedItem implements Serializable {
 
+   //private static final long serialVersionUID = 1L;
     private String name;
     private int quantity;
 
     public DonatedItem(String name, int quantity) {
-      
+
         this.name = name;
         this.quantity = quantity;
     }
-
- 
 
     public String getName() {
         return name;

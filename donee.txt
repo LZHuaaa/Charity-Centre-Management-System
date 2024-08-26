@@ -1,0 +1,3 @@
+DE001,lee,Individual,012-3456789
+DE002,leehua,Organisation,012-3456789
+DE003,leehuahua,Family,012-3456789
