@@ -16,13 +16,17 @@ public class doneeMaintenance {
     private ListInterface<Donee> doneeList = new ArrayList<>();
     private DoneeDAO doneeDAO = new DoneeDAO();
     private DoneeUI doneeUI = new DoneeUI();
+    private HashMap<String,Donee> doneeMap = new HashMap<>();
     
 
     public doneeMaintenance() {
-        //doneeList = new ArrayList<>();
+    
 
         doneeList = doneeDAO.retrieveDonees();
         doneeDAO.retrieveDonations(doneeList);
+        
+        doneeMap = doneeDAO.loadDoneesIntoMap();
+        doneeDAO.loadDonationsIntoDonees(doneeMap);
     }
 
     public void runDoneeMaintenance() {
@@ -34,9 +38,7 @@ public class doneeMaintenance {
                     MessageUI.displayExitMessage();
                     break;
                 case 1:
-                    if (addDonee()) {
-                        System.out.println("Donee added to file successfully.");
-                    }
+                    addDonee();
                     break;
                 case 2:
                     //remove
@@ -45,7 +47,7 @@ public class doneeMaintenance {
                     //update
                     break;
                 case 4:
-                    //search
+                    searchDonee(doneeMap);
                     break;
                 case 5:
                     listAll();
@@ -61,13 +63,18 @@ public class doneeMaintenance {
     }
 
     public boolean addDonee() {
-        doneeUI.addDonee(doneeList);
+        Donee donee = doneeUI.addDonee(doneeList);
+        doneeMap.put(donee.getId(), donee);
 
         return doneeDAO.saveDonees(doneeList);
     }
 
     public void listAll() {
         doneeUI.listDoneesWithDonations(doneeList);
+    }
+    
+     public void searchDonee(HashMap<String, Donee> doneeMap) {
+        doneeUI.searchDonee(doneeMap);
     }
 
     public void reverseDonees() {
