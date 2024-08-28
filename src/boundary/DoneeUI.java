@@ -38,6 +38,7 @@ public class DoneeUI {
         System.out.println("---Please enter the donee details---");
 
         String newId = doneeDAO.generateNewId(doneeList);
+        System.out.println("Donee ID: " + newId);
 
         System.out.print("Enter donee name: ");
         String name = scanner.nextLine().trim();
@@ -84,12 +85,20 @@ public class DoneeUI {
         }
 
         // Now ask if they want to add a donation
-        System.out.print("\nDo you want to add a donation? (yes/no): ");
-        String addDonationResponse = scanner.nextLine().trim();
+        String addDonationResponse;
+        do {
+            System.out.print("\nDo you want to add a donation? (y/n): ");
+            addDonationResponse = scanner.nextLine().trim();
+
+            if (!addDonationResponse.equalsIgnoreCase("y") && !addDonationResponse.equalsIgnoreCase("n")) {
+                System.out.println("Invalid choice. Please select again.");
+            }
+
+        } while (!addDonationResponse.equalsIgnoreCase("y") && !addDonationResponse.equalsIgnoreCase("n"));
 
         ListInterface<Donation> donations = new ArrayList<>();
 
-        if (addDonationResponse.equalsIgnoreCase("yes")) {
+        if (addDonationResponse.equalsIgnoreCase("y")) {
             boolean moreDonations = true;
 
             while (moreDonations) {
@@ -118,12 +127,20 @@ public class DoneeUI {
                 }
 
                 // Ask if they want to add donated items
-                System.out.print("\nDo you want to add donated items? (yes/no): ");
-                String addItemsResponse = scanner.nextLine().trim();
+                String addItemsResponse;
+                do {
+                    System.out.print("\nDo you want to add donated items? (y/n): ");
+                    addItemsResponse = scanner.nextLine().trim();
+
+                    if (!addItemsResponse.equalsIgnoreCase("y") && !addItemsResponse.equalsIgnoreCase("n")) {
+                        System.out.println("Invalid choice. Please select again.");
+                    }
+
+                } while (!addItemsResponse.equalsIgnoreCase("y") && !addItemsResponse.equalsIgnoreCase("n"));
 
                 ListInterface<DonatedItem> donatedItems = new ArrayList<>();
 
-                if (addItemsResponse.equalsIgnoreCase("yes")) {
+                if (addItemsResponse.equalsIgnoreCase("y")) {
                     boolean moreItems = true;
 
                     while (moreItems) {
@@ -154,9 +171,18 @@ public class DoneeUI {
                         DonatedItem donatedItem = new DonatedItem(itemName, quantity);
                         donatedItems.add(donatedItem);
 
-                        System.out.print("\nDo you want to add another item? (yes/no): ");
-                        String response = scanner.nextLine().trim();
-                        moreItems = response.equalsIgnoreCase("yes");
+                        String response;
+                        do {
+                            System.out.print("\nDo you want to add another item? (y/n): ");
+                            response = scanner.nextLine().trim();
+
+                            if (!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("n")) {
+                                System.out.println("Invalid choice. Please select again.");
+                            }
+
+                        } while (!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("n"));
+
+                        moreItems = response.equalsIgnoreCase("y");
                     }
                 }
 
@@ -164,10 +190,18 @@ public class DoneeUI {
                 donation.setItems(donatedItems);
                 donations.add(donation);
 
-                System.out.print("\nDo you want to add another donation? (yes/no): ");
-                String response = scanner.nextLine().trim();
-                moreDonations = response.equalsIgnoreCase("yes");
+                String response;
+                do {
+                    System.out.print("\nDo you want to add another donation? (y/n): ");
+                    response = scanner.nextLine().trim();
+                    moreDonations = response.equalsIgnoreCase("y");
+
+                    if (!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("n")) {
+                        System.out.println("Invalid choice. Please select again");
+                    }
+                } while (!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("n"));
             }
+
         }
 
         Donee newDonee = new Donee(newId, name, type, contactNo);
@@ -177,6 +211,78 @@ public class DoneeUI {
         System.out.println("\nDonee added successfully!");
 
         return newDonee;
+    }
+
+    public void searchDonee(HashMap<String, Donee> doneeMap) {
+        System.out.print("Enter Donee ID to search: ");
+        String doneeId = scanner.nextLine();
+        Donee donee = doneeMap.get(doneeId);
+
+        if (donee != null) {
+            System.out.println("\n--Donee Found--");
+            System.out.println("ID: " + donee.getId());
+            System.out.println("Name: " + donee.getName());
+            System.out.println("Type: " + donee.getType());
+            System.out.println("Contact Number: " + donee.getContactNo());
+
+            // Ask user if they want to display donation details
+            String response;
+            do {
+                System.out.print("\nWould you like to display donations for this donee? (y/n): ");
+                response = scanner.nextLine().trim().toLowerCase();
+
+                if (response.equals("y")) {
+                    displayDonations(donee);
+
+                } else if (!response.equals("n")) {
+                    System.out.println("Invalid choice. Please select again.");
+                }
+
+            } while (!response.equals("n") && !response.equals("y"));
+
+        } else {
+            System.out.println("No donee found with ID: " + doneeId);
+        }
+    }
+
+    private void displayDonations(Donee donee) {
+
+        ListInterface<Donation> donations = donee.getDonations();
+
+        if (donations != null && !donations.isEmpty()) {
+            System.out.println("\n|------------------------------------------------------------------------------------------|");
+            System.out.println("|                                     Donations                                            |");
+            System.out.println("|------------------------------------------------------------------------------------------|");
+            System.out.printf("| %-30s | %-18s | %-20s | %-10s  |\n", "Description", "Cash Amount (RM)", "Item Name", "Quantity");
+            System.out.println("|------------------------------------------------------------------------------------------|");
+
+            for (int j = 0; j < donations.size(); j++) {
+                Donation donation = donations.getEntry(j);
+                ListInterface<DonatedItem> donatedItems = donation.getItems();
+
+                if (donatedItems != null && !donatedItems.isEmpty()) {
+                    for (int k = 0; k < donatedItems.size(); k++) {
+                        DonatedItem item = donatedItems.getEntry(k);
+                        System.out.printf("| %-30s | %-18.2f | %-20s | %-10d  |\n",
+                                donation.getDescription(),
+                                donation.getCashAmount(),
+                                item.getName(),
+                                item.getQuantity()
+                        );
+                    }
+                } else {
+                    System.out.printf("| %-30s | %-18.2f | %-20s | %-10s  |\n",
+                            donation.getDescription(),
+                            donation.getCashAmount(),
+                            "N/A",
+                            "N/A"
+                    );
+                }
+            }
+            System.out.println("|------------------------------------------------------------------------------------------|");
+        } else {
+            System.out.println("No donations available.");
+        }
     }
 
     public void listDoneesWithDonations(ListInterface<Donee> doneeList) {
