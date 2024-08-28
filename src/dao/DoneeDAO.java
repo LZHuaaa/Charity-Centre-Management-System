@@ -73,6 +73,8 @@ public class DoneeDAO {
                     doneeList.add(donee);
                 }
             }
+
+            
         } catch (IOException e) {
             System.out.println("Error reading donees from file: " + e.getMessage());
         }
@@ -119,6 +121,65 @@ public class DoneeDAO {
                         currentDonation.getItems().add(item);
                     }
 
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading donations from file: " + e.getMessage());
+        }
+    }
+
+    public HashMap<String, Donee> loadDoneesIntoMap() {
+
+        HashMap<String, Donee> doneeMap = new HashMap<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] doneeData = line.split(",");
+                if (doneeData.length == 4) {
+                    Donee donee = new Donee(doneeData[0], doneeData[1], doneeData[2], doneeData[3]);
+                    doneeMap.put(donee.getId(), donee);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading donees from file: " + e.getMessage());
+        }
+
+        return doneeMap;
+    }
+
+    public void loadDonationsIntoDonees(HashMap<String, Donee> doneeMap) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("donation.txt"))) {
+            String line;
+            Donee currentDonee = null;
+            Donation currentDonation = null;
+
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                if (line.isEmpty()) {
+                    continue;
+                }
+
+                if (!line.startsWith("    ")) {
+                    String[] donationData = line.split(",");
+                    if (donationData.length == 3) {
+                        String doneeId = donationData[0];
+                        String description = donationData[1];
+                        double cashAmount = Double.parseDouble(donationData[2]);
+
+                        currentDonee = doneeMap.get(doneeId);
+                        if (currentDonee != null) {
+                            currentDonation = new Donation(description, cashAmount);
+                            currentDonee.addDonation(currentDonation);
+                        }
+                    } else if (donationData.length == 2) {
+                        String itemName = donationData[0];
+                        int quantity = Integer.parseInt(donationData[1]);
+                        DonatedItem item = new DonatedItem(itemName, quantity);
+
+                        if (currentDonation != null) {
+                            currentDonation.getItems().add(item);
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
