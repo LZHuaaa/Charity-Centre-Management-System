@@ -4,7 +4,6 @@
  */
 package entity;
 
-
 import java.util.Objects;
 import adt.*;
 import dao.*;
@@ -14,13 +13,17 @@ import control.*;
  *
  * @author leezh
  */
-public class Donee {
-    
+public class Donee implements Comparable<Donee> {
+
     private String id;
     private String name;
     private String type;
     private String contactNo;
     private ArrayList<Donation> donations;
+    
+     public Donee() {
+       
+    }
 
     public Donee(String id, String name, String type, String contactNo) {
 
@@ -105,4 +108,27 @@ public class Donee {
                 + ", donations=" + donations
                 + '}';
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Donee donee = (Donee) obj;
+        return id.equals(donee.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public int compareTo(Donee o) {
+        return this.type.compareTo(o.type);
+    }
+
 }

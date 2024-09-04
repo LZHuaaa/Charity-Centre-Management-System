@@ -8,11 +8,11 @@ public class MessageUI {
   
   
   public static void displayInvalidChoiceMessage() {
-    System.out.println("\nInvalid choice");
+    System.out.println("Invalid choice. Please select again.");
   }
 
   public static void displayExitMessage() {
-    System.out.println("\nExiting system");
+    System.out.println("Exiting system......");
   }
   
 }

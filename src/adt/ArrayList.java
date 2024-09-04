@@ -86,8 +86,8 @@ public class ArrayList<T> implements ListInterface<T> {
     @Override
     public T replace(int index, T newEntry) {
 
-        if (index < 0 || index <= size) {
-            throw new IndexOutOfBoundsException("The position should within" + size);
+        if (index < 0 || index >= size) {
+            throw new IndexOutOfBoundsException("The position should within " + size);
         }
 
         if (validateItem(newEntry)) {

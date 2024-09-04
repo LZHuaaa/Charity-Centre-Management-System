@@ -7,6 +7,7 @@ package boundary;
 import entity.*;
 import java.util.Scanner;
 import adt.*;
+import control.doneeMaintenance;
 import dao.*;
 
 /**
@@ -24,17 +25,17 @@ public class DoneeUI {
         System.out.println("2. Remove donee");
         System.out.println("3. Update donee details");
         System.out.println("4. Search donee details");
-        System.out.println("5. List donee with all the donation made");
+        System.out.println("5. List donee with all the donation received");
         System.out.println("6. Filter donee based on criteria");
         System.out.println("7. Generate summary report");
-        System.out.print("Enter choice > ");
+        System.out.print("Enter choice (0 = Exit) : ");
         int choice = scanner.nextInt();
         scanner.nextLine();
         System.out.println();
         return choice;
     }
 
-    public Donee addDonee(ListInterface<Donee> doneeList) {
+    public Donee addDonee(ListInterface<Donee> doneeList, ListInterface<Donation> availableDonations) {
         System.out.println("---Please enter the donee details---");
 
         String newId = doneeDAO.generateNewId(doneeList);
@@ -57,7 +58,7 @@ public class DoneeUI {
             System.out.print("Enter choice (1, 2, or 3): ");
             if (scanner.hasNextInt()) {
                 choice = scanner.nextInt();
-                scanner.nextLine();
+                scanner.nextLine(); // Consume newline
                 switch (choice) {
                     case 1:
                         type = "Individual";
@@ -84,133 +85,280 @@ public class DoneeUI {
             contactNo = scanner.nextLine().trim();
         }
 
-        // Now ask if they want to add a donation
+        // Ask if they want to add donations
         String addDonationResponse;
-        do {
-            System.out.print("\nDo you want to add a donation? (y/n): ");
-            addDonationResponse = scanner.nextLine().trim();
+        ListInterface<Donation> selectedDonations = new ArrayList<>();
 
-            if (!addDonationResponse.equalsIgnoreCase("y") && !addDonationResponse.equalsIgnoreCase("n")) {
-                System.out.println("Invalid choice. Please select again.");
-            }
+        if (availableDonations.isEmpty()) {
+            System.out.println("No donations can be added.");
+        } else {
 
-        } while (!addDonationResponse.equalsIgnoreCase("y") && !addDonationResponse.equalsIgnoreCase("n"));
+            do {
+                System.out.println("\n---Available Donations---");
+                System.out.printf("\n%-10s %-10s %-30s %-10s %-30s %-10s%n", "No", "ID", "Description", "Amount", "Item", "Qty");
+                System.out.println("----------------------------------------------------------------------------------------------------");
 
-        ListInterface<Donation> donations = new ArrayList<>();
+                for (int i = 0; i < availableDonations.size(); i++) {
+                    Donation donation = availableDonations.getEntry(i);
+                    String donationId = donation.getDonationId();
+                    String description = donation.getDescription();
+                    double amount = donation.getCashAmount();
 
-        if (addDonationResponse.equalsIgnoreCase("y")) {
-            boolean moreDonations = true;
+                    // Display donation details
+                    System.out.printf("%-10s %-10s %-30s %-10.2f", i + 1, donationId, description, amount);
 
-            while (moreDonations) {
-                System.out.println("\n---Add donation details---");
+                    // Display items associated with this donation
+                    ListInterface<DonatedItem> items = donation.getItems();
+                    if (items.size() > 0) {
+                        for (int j = 0; j < items.size(); j++) {
+                            DonatedItem item = items.getEntry(j);
 
-                System.out.print("Enter donation description: ");
-                String description = scanner.nextLine().trim();
-                while (description.isEmpty()) {
-                    System.out.print("\nDescription cannot be empty. Enter donation description: ");
-                    description = scanner.nextLine().trim();
-                }
-
-                double cashAmount = -1;
-                while (cashAmount < 0) {
-                    System.out.print("Enter cash amount: RM");
-                    if (scanner.hasNextDouble()) {
-                        cashAmount = scanner.nextDouble();
-                        scanner.nextLine();
-                        if (cashAmount < 0) {
-                            System.out.println("\nCash amount cannot be negative. Please enter a valid amount.");
+                            if (j == 0) {
+                                System.out.printf(" %-30s %-10d%n", item.getName(), item.getQuantity());
+                            } else {
+                                System.out.printf("%-63s", "");
+                                System.out.printf(" %-30s %-10d%n", item.getName(), item.getQuantity());
+                            }
                         }
                     } else {
-                        System.out.println("\nInvalid input. Please enter a valid cash amount.");
-                        scanner.next();
+                        System.out.println();
+                    }
+
+                }
+
+                boolean moreDonations = true;
+                while (moreDonations) {
+                    System.out.print("\nEnter the number of the donation to add (0 = Exit): ");
+                    int donationChoice = -1;
+                    if (scanner.hasNextInt()) {
+                        donationChoice = scanner.nextInt();
+                        scanner.nextLine();
+                        if (donationChoice > 0 && donationChoice <= availableDonations.size()) {
+                            Donation selectedDonation = availableDonations.getEntry(donationChoice - 1);
+                            selectedDonations.add(selectedDonation);
+                            availableDonations.remove(donationChoice - 1);
+                            break;
+                        } else {
+                            System.out.println("Invalid choice. Please select again.");
+                        }
                     }
                 }
 
-                // Ask if they want to add donated items
-                String addItemsResponse;
-                do {
-                    System.out.print("\nDo you want to add donated items? (y/n): ");
-                    addItemsResponse = scanner.nextLine().trim();
+                if (availableDonations.isEmpty()) {
 
-                    if (!addItemsResponse.equalsIgnoreCase("y") && !addItemsResponse.equalsIgnoreCase("n")) {
-                        System.out.println("Invalid choice. Please select again.");
-                    }
-
-                } while (!addItemsResponse.equalsIgnoreCase("y") && !addItemsResponse.equalsIgnoreCase("n"));
-
-                ListInterface<DonatedItem> donatedItems = new ArrayList<>();
-
-                if (addItemsResponse.equalsIgnoreCase("y")) {
-                    boolean moreItems = true;
-
-                    while (moreItems) {
-                        System.out.println("\n---Add donated item details---");
-
-                        System.out.print("Enter item name: ");
-                        String itemName = scanner.nextLine().trim();
-                        while (itemName.isEmpty()) {
-                            System.out.print("\nItem name cannot be empty. Enter item name: ");
-                            itemName = scanner.nextLine().trim();
-                        }
-
-                        int quantity = -1;
-                        while (quantity <= 0) {
-                            System.out.print("Enter item quantity: ");
-                            if (scanner.hasNextInt()) {
-                                quantity = scanner.nextInt();
-                                scanner.nextLine();
-                                if (quantity <= 0) {
-                                    System.out.println("\nQuantity must be positive. Please enter a valid quantity.");
-                                }
-                            } else {
-                                System.out.println("\nInvalid input. Please enter a valid quantity.");
-                                scanner.next();
-                            }
-                        }
-
-                        DonatedItem donatedItem = new DonatedItem(itemName, quantity);
-                        donatedItems.add(donatedItem);
-
-                        String response;
-                        do {
-                            System.out.print("\nDo you want to add another item? (y/n): ");
-                            response = scanner.nextLine().trim();
-
-                            if (!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("n")) {
-                                System.out.println("Invalid choice. Please select again.");
-                            }
-
-                        } while (!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("n"));
-
-                        moreItems = response.equalsIgnoreCase("y");
-                    }
+                    break;
                 }
 
-                Donation donation = new Donation(description, cashAmount);
-                donation.setItems(donatedItems);
-                donations.add(donation);
+                System.out.print("\nDo you want to add more donations? (Y/N): ");
+                addDonationResponse = scanner.nextLine().trim();
 
-                String response;
-                do {
-                    System.out.print("\nDo you want to add another donation? (y/n): ");
-                    response = scanner.nextLine().trim();
-                    moreDonations = response.equalsIgnoreCase("y");
+                if (!addDonationResponse.equalsIgnoreCase("y") && !addDonationResponse.equalsIgnoreCase("n")) {
+                    System.out.println("Invalid choice. Please select again.");
+                    addDonationResponse = "";
+                }
 
-                    if (!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("n")) {
-                        System.out.println("Invalid choice. Please select again");
-                    }
-                } while (!response.equalsIgnoreCase("y") && !response.equalsIgnoreCase("n"));
-            }
-
+            } while (!addDonationResponse.equalsIgnoreCase("n"));
         }
 
         Donee newDonee = new Donee(newId, name, type, contactNo);
-        newDonee.setDonations((ArrayList<Donation>) donations);
+        newDonee.setDonations((ArrayList<Donation>) selectedDonations);
         doneeList.add(newDonee);
 
         System.out.println("\nDonee added successfully!");
 
         return newDonee;
+    }
+
+    public void removeDonee() {
+        boolean exist = false;
+
+        Scanner scanner = new Scanner(System.in);
+
+        while (!exist) {
+            System.out.print("Enter the donee ID to remove: ");
+            String doneeId = scanner.nextLine();
+
+            doneeMaintenance dm = new doneeMaintenance();
+            Donee donee = dm.remove(doneeId);
+
+            if (donee != null) {
+                System.out.println("\nDonee " + donee.getName() + " removed successfully!");
+                ListInterface<Donation> donations = donee.getDonations();
+
+                for (int i = 0; i < donations.size(); i++) {
+                    Donation donation = donations.getEntry(i);
+                    //dm.addDonation(donation);
+                }
+                System.out.println("Associated donations have been returned to the donation list.");
+                exist = true;
+            } else {
+                System.out.println("\nDonee not found, please try again.");
+            }
+        }
+
+    }
+
+    public void updateDoneeDetails(HashMap<String, Donee> doneeMap, ListInterface<Donation> availableDonations) {
+
+        Donee donee = new Donee();
+        String doneeId;
+
+        do {
+            System.out.print("Enter Donee ID to update (Enter 1 to exit): ");
+            doneeId = scanner.nextLine().trim();
+
+            if ("1".equals(doneeId)) {
+                return;
+            }
+
+            donee = doneeMap.get(doneeId);
+
+            if (donee == null) {
+                System.out.println("No donee found with the given ID. Please try again.\n");
+
+            }
+        } while (donee == null);
+
+        ListInterface<Donation> donations = donee.getDonations();
+
+        System.out.println("\n--Donee Found--");
+        System.out.println("ID: " + donee.getId());
+        System.out.println("Name: " + donee.getName());
+        System.out.println("Type: " + donee.getType());
+        System.out.println("Contact Number: " + donee.getContactNo());
+
+        System.out.print("\nEnter new name: ");
+        String newName = scanner.nextLine().trim();
+
+        System.out.println("\nSelect the new donee type:");
+        System.out.println("1. Individual");
+        System.out.println("2. Organisation");
+        System.out.println("3. Family");
+        String type = "";
+        int choice = -1;
+        while (choice < 1 || choice > 3) {
+            System.out.print("Enter choice (1, 2, or 3): ");
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                switch (choice) {
+                    case 1:
+                        type = "Individual";
+                        break;
+                    case 2:
+                        type = "Organisation";
+                        break;
+                    case 3:
+                        type = "Family";
+                        break;
+                    default:
+                        System.out.println("\nInvalid choice. Please enter a valid choice.");
+                }
+            } else {
+                System.out.println("\nInvalid input. Please enter a number.");
+                scanner.next();
+            }
+        }
+
+        System.out.print("\nPlease enter the new contact number (e.g. 012-3456789): ");
+        String contactNo = scanner.nextLine().trim();
+        while (!contactNo.matches("\\d{3}-\\d{7}")) {
+            System.out.print("\nInvalid format. Please enter the contact number (e.g. 012-3456789): ");
+            contactNo = scanner.nextLine().trim();
+        }
+
+        // Ask if they want to add donations
+        String addDonationResponse;
+        ListInterface<Donation> selectedDonations = new ArrayList<>();
+
+        System.out.print("\nDo you want to add more donations (Y/N)? ");
+
+        String response = scanner.nextLine().trim();
+
+        if (response.equalsIgnoreCase("y")) {
+
+            if (availableDonations.isEmpty()) {
+                System.out.println("\nThe donation list is empty.");
+            } else {
+
+                do {
+                    System.out.println("\n---Available Donations---");
+                    System.out.printf("\n%-10s %-10s %-30s %-10s %-30s %-10s%n", "No", "ID", "Description", "Amount", "Item", "Qty");
+                    System.out.println("----------------------------------------------------------------------------------------------------");
+
+                    for (int i = 0; i < availableDonations.size(); i++) {
+                        Donation donation = availableDonations.getEntry(i);
+                        String donationId = donation.getDonationId();
+                        String description = donation.getDescription();
+                        double amount = donation.getCashAmount();
+
+                        // Display donation details
+                        System.out.printf("%-10s %-10s %-30s %-10.2f", i + 1, donationId, description, amount);
+
+                        // Display items associated with this donation
+                        ListInterface<DonatedItem> items = donation.getItems();
+                        if (items.size() > 0) {
+                            for (int j = 0; j < items.size(); j++) {
+                                DonatedItem item = items.getEntry(j);
+
+                                if (j == 0) {
+                                    System.out.printf(" %-30s %-10d%n", item.getName(), item.getQuantity());
+                                } else {
+                                    System.out.printf("%-63s", "");
+                                    System.out.printf(" %-30s %-10d%n", item.getName(), item.getQuantity());
+                                }
+                            }
+                        } else {
+                            System.out.println(); // Move to next line if no items
+                        }
+
+                    }
+
+                    boolean moreDonations = true;
+                    while (moreDonations) {
+                        System.out.print("\nEnter the number of the donation to add: ");
+                        int donationChoice = -1;
+                        if (scanner.hasNextInt()) {
+                            donationChoice = scanner.nextInt();
+                            scanner.nextLine();
+                            if (donationChoice > 0 && donationChoice <= availableDonations.size()) {
+                                Donation selectedDonation = availableDonations.getEntry(donationChoice - 1);
+                                donations.add(selectedDonation);
+                                availableDonations.remove(donationChoice - 1);
+                                break;
+                            } else {
+                                System.out.println("Invalid choice. Please select again.");
+                            }
+                        }
+                    }
+
+                    if (availableDonations.isEmpty()) {
+
+                        break;
+                    }
+
+                    System.out.print("\nDo you want to add more donations? (Y/N): ");
+                    addDonationResponse = scanner.nextLine().trim();
+
+                    if (!addDonationResponse.equalsIgnoreCase("y") && !addDonationResponse.equalsIgnoreCase("n")) {
+                        System.out.println("Invalid choice. Please select again.");
+                        addDonationResponse = "";
+                    }
+
+                } while (!addDonationResponse.equalsIgnoreCase("n"));
+            }
+
+        }
+
+        doneeMaintenance dm = new doneeMaintenance();
+
+        boolean updated = dm.updateDonee(doneeId, newName, type, contactNo, (ArrayList<Donation>) donations);
+
+        if (updated) {
+            System.out.println("Donee details updated successfully.");
+        } else {
+            System.out.println("Failed to update donee details.");
+        }
     }
 
     public void searchDonee(HashMap<String, Donee> doneeMap) {
@@ -228,7 +376,7 @@ public class DoneeUI {
             // Ask user if they want to display donation details
             String response;
             do {
-                System.out.print("\nWould you like to display donations for this donee? (y/n): ");
+                System.out.print("\nWould you like to display donations for this donee? (Y/N): ");
                 response = scanner.nextLine().trim().toLowerCase();
 
                 if (response.equals("y")) {
@@ -246,7 +394,6 @@ public class DoneeUI {
     }
 
     private void displayDonations(Donee donee) {
-
         ListInterface<Donation> donations = donee.getDonations();
 
         if (donations != null && !donations.isEmpty()) {
@@ -263,17 +410,19 @@ public class DoneeUI {
                 if (donatedItems != null && !donatedItems.isEmpty()) {
                     for (int k = 0; k < donatedItems.size(); k++) {
                         DonatedItem item = donatedItems.getEntry(k);
-                        System.out.printf("| %-30s | %-18.2f | %-20s | %-10d  |\n",
+                        // Using format specifier "%.2f" for cash amount
+                        System.out.printf("| %-30s | %-18s | %-20s | %-10d  |\n",
                                 donation.getDescription(),
-                                donation.getCashAmount(),
+                                donation.getCashAmount() == 0 ? "N/A" : String.format("%.2f", donation.getCashAmount()),
                                 item.getName(),
                                 item.getQuantity()
                         );
                     }
                 } else {
-                    System.out.printf("| %-30s | %-18.2f | %-20s | %-10s  |\n",
+                    // Handle case where there are no donated items
+                    System.out.printf("| %-30s | %-18s | %-20s | %-10s  |\n",
                             donation.getDescription(),
-                            donation.getCashAmount(),
+                            donation.getCashAmount() == 0 ? "N/A" : String.format("%.2f", donation.getCashAmount()),
                             "N/A",
                             "N/A"
                     );
@@ -311,9 +460,9 @@ public class DoneeUI {
                         if (donatedItems != null && !donatedItems.isEmpty()) {
                             for (int k = 0; k < donatedItems.size(); k++) {
                                 DonatedItem item = donatedItems.getEntry(k);
-                                System.out.printf("| %-30s | %-18.2f | %-20s | %-10d  |\n",
+                                System.out.printf("| %-30s | %-18s | %-20s | %-10d  |\n",
                                         donation.getDescription(),
-                                        donation.getCashAmount(),
+                                        donation.getCashAmount() == 0 ? "" : String.format("%.2f", donation.getCashAmount()),
                                         item.getName(),
                                         item.getQuantity()
                                 );
@@ -325,7 +474,7 @@ public class DoneeUI {
 
                             System.out.printf("| %-30s | %-18.2f | %-20s | %-10s  |\n",
                                     donation.getDescription(),
-                                    donation.getCashAmount(),
+                                    donation.getCashAmount() == 0 ? "" : String.format("%.2f", donation.getCashAmount()),
                                     "N/A",
                                     "N/A"
                             );
@@ -339,5 +488,147 @@ public class DoneeUI {
             }
         }
     }
+
+    public int filterDonee() {
+
+        System.out.println("Filter Donees");
+        System.out.println("1. Filter by Donee Type");
+        System.out.println("2. Filter by Donation");
+        System.out.println("0. Exit");
+        System.out.print("Enter your choice: ");
+
+        int choice = -1;
+        while (choice < 0 || choice > 2) {
+
+            choice = scanner.nextInt();
+            if (choice < 0 || choice > 2) {
+                System.out.println("Invalid choice. Please select again.");
+            }
+        }
+        return choice;
+
+    }
+
+    public int displaySortMenu() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\nFilter Donees by Type:");
+        System.out.println("1. Individual");
+        System.out.println("2. Organisation");
+        System.out.println("3. Family");
+        System.out.println("0. Exit");
+        System.out.print("Enter your choice: ");
+        return scanner.nextInt();
+    }
+
+    public void filterDoneesByDonationAmount() {
+        double minAmount = -1;
+        double maxAmount = -1;
+
+        do {
+
+            System.out.print("\nEnter minimum donation amount: RM");
+
+            try {
+                minAmount = scanner.nextDouble();
+
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+            }
+        } while (minAmount == -1);
+
+        do {
+            System.out.print("Enter maximum donation amount: RM");
+            try {
+                maxAmount = scanner.nextDouble();
+
+                if (maxAmount < minAmount) {
+                    System.out.printf("The maximum amount should bigger than minimum amount. Please try again.\n\n");
+                    maxAmount = -1;
+                }
+
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+            }
+        } while (maxAmount == -1);
+
+        doneeMaintenance dm = new doneeMaintenance();
+
+        dm.filterDoneesByDonationAmount(minAmount, maxAmount);
+
+    }
+
+    public double getDoubleInput() {
+        double input = -1;
+        boolean valid = false;
+
+        while (!valid) {
+
+            try {
+                input = scanner.nextDouble();
+                valid = true;
+            } catch (Exception e) {
+                System.out.println("Invalid input. Please enter a valid number.");
+                scanner.next();
+            }
+        }
+
+        return input;
+    }
+
+    public void printDoneesTable(ListInterface<Donee> donees) {
+        System.out.println("\n| ID        | Name                | Type           | Contact No     |");
+        System.out.println("|-----------|---------------------|----------------|----------------|");
+
+        for (int i = 0; i < donees.size(); i++) {
+            Donee donee = donees.getEntry(i);
+            System.out.printf("| %-9s | %-19s | %-14s | %-14s |\n",
+                    donee.getId(),
+                    donee.getName(),
+                    donee.getType(),
+                    donee.getContactNo());
+        }
+
+        System.out.println("|-----------|---------------------|----------------|----------------|\n");
+    }
+
+   public void generateDoneeSummaryReport(ListInterface<Donee> doneeList) {
+    System.out.println("Donee Summary Report");
+    System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
+    System.out.printf("| %-10s | %-20s | %-15s | %-15s | %-18s | %-15s | %-13s |\n",
+            "ID", "Name", "Type", "Contact No", "Donations Received", "Total Cash (RM)", "Total Items");
+    System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
+
+    for (int i = 0; i < doneeList.size(); i++) {
+        Donee donee = doneeList.getEntry(i);
+        ListInterface<Donation> donations = donee.getDonations();
+
+        int donationCount = donations.size();
+        double totalCash = 0.0;
+        int totalItems = 0;
+
+        for (int j = 0; j < donations.size(); j++) {
+            Donation donation = donations.getEntry(j);
+            totalCash += donation.getCashAmount();
+
+            ListInterface<DonatedItem> donatedItems = donation.getItems();
+            if (donatedItems != null) {
+                totalItems += donatedItems.size();
+            }
+        }
+
+        System.out.printf("| %-10s | %-20s | %-15s | %-15s | %-18d | %-15.2f | %-13d |\n",
+                donee.getId(),
+                donee.getName(),
+                donee.getType(),
+                donee.getContactNo(),
+                donationCount,
+                totalCash,
+                totalItems
+        );
+    }
+
+    System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
+}
+
 
 }

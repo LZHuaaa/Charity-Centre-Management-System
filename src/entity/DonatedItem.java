@@ -4,6 +4,8 @@
  */
 package entity;
 
+import java.util.Objects;
+
 
 /**
  *
@@ -44,4 +46,18 @@ public class DonatedItem {
                 + ", quantity=" + quantity
                 + '}';
     }
+    
+    @Override
+public boolean equals(Object obj) {
+    if (this == obj) return true;
+    if (obj == null || getClass() != obj.getClass()) return false;
+    DonatedItem item = (DonatedItem) obj;
+    return name.equals(item.name);
+}
+
+@Override
+public int hashCode() {
+    return Objects.hash(name);
+}
+
 }

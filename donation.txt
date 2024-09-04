@@ -1,5 +1,9 @@
-DE001,helping purpose,25.0
-DE003,helping others,500.0
-    toy,25
-    doll,50
-DE003,what,400.0
+DN001,Food Drive,100.0
+    Canned Beans,10
+    Rice,5
+DN002,Clothing Drive,200.0
+    T-shirts,30
+DN003,Book Drive,400.0
+    Story Books,30
+DN004,Testing Drive,100.0
+    bottles,30

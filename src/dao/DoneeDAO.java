@@ -25,11 +25,21 @@ public class DoneeDAO {
     }
 
     public boolean saveDonees(ListInterface<Donee> doneeList) {
-
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("donee.txt"))) {
             for (int i = 0; i < doneeList.size(); i++) {
                 Donee donee = doneeList.getEntry(i);
-                writer.write(donee.getId() + "," + donee.getName() + "," + donee.getType() + "," + donee.getContactNo());
+                StringBuilder donationIds = new StringBuilder();
+
+                ListInterface<Donation> donations = donee.getDonations();
+                for (int j = 0; j < donations.size(); j++) {
+                    Donation donation = donations.getEntry(j);
+                    donationIds.append(donation.getDonationId());
+                    if (j < donations.size() - 1) {
+                        donationIds.append(";");
+                    }
+                }
+
+                writer.write(donee.getId() + "," + donee.getName() + "," + donee.getType() + "," + donee.getContactNo() + "," + donationIds.toString());
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -37,107 +47,70 @@ public class DoneeDAO {
             return false;
         }
 
-        return saveDonations(doneeList);
-    }
-
-    public boolean saveDonations(ListInterface<Donee> doneeList) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("donation.txt"))) {
-            for (int i = 0; i < doneeList.size(); i++) {
-                Donee donee = doneeList.getEntry(i);
-                for (int j = 0; j < donee.getDonations().size(); j++) {
-                    Donation donation = donee.getDonations().getEntry(j);
-                    writer.write(donee.getId() + "," + donation.getDescription() + "," + donation.getCashAmount());
-                    writer.newLine();
-                    for (int k = 0; k < donation.getItems().size(); k++) {
-                        DonatedItem item = donation.getItems().getEntry(k);
-                        writer.write("    " + item.getName() + "," + item.getQuantity());
-                        writer.newLine();
-                    }
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error writing donations to file: " + e.getMessage());
-            return false;
-        }
         return true;
     }
 
+    //retrieve donee(array)
     public ListInterface<Donee> retrieveDonees() {
         ListInterface<Donee> doneeList = new ArrayList<>();
+        HashMapInterface<String, Donation> donationMap = retrieveDonations();
+
         try (BufferedReader reader = new BufferedReader(new FileReader("donee.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] doneeData = line.split(",");
-                if (doneeData.length == 4) {
+                if (doneeData.length >= 4) {
                     Donee donee = new Donee(doneeData[0], doneeData[1], doneeData[2], doneeData[3]);
+
+                    // Check if there are any donation IDs
+                    if (doneeData.length > 4 && !doneeData[4].trim().isEmpty()) {
+                        String[] donationIDs = doneeData[4].split(";");
+
+                        // Retrieve donations from the map and add them to the donee
+                        for (String donationID : donationIDs) {
+                            Donation donation = donationMap.get(donationID.trim());
+                            if (donation != null) {
+                                donee.addDonation(donation);
+                            }
+                        }
+                    }
+
                     doneeList.add(donee);
                 }
             }
-
-            
         } catch (IOException e) {
             System.out.println("Error reading donees from file: " + e.getMessage());
         }
+
         return doneeList;
     }
+    
+    //retrieve donee(hashMap)
+     public HashMap<String, Donee> loadDoneesIntoMap() {
 
-    public void retrieveDonations(ListInterface<Donee> doneeList) {
-        try (BufferedReader reader = new BufferedReader(new FileReader("donation.txt"))) {
-            String line;
-            Donee currentDonee = null;
-            Donation currentDonation = null;
-
-            while ((line = reader.readLine()) != null) {
-                line = line.trim();
-
-                if (line.isEmpty()) {
-                    continue;
-                }
-
-                if (!line.startsWith("    ")) {
-                    // Read Donation
-                    String[] donationData = line.split(",");
-                    if (donationData.length == 3) {
-                        String doneeId = donationData[0];
-                        String description = donationData[1];
-                        double cashAmount = Double.parseDouble(donationData[2]);
-
-                        // Find Donee
-                        currentDonee = findDoneeById(doneeList, doneeId);
-                        if (currentDonee != null) {
-                            // Create and add Donation to Donee
-                            currentDonation = new Donation(description, cashAmount);
-                            currentDonee.addDonation(currentDonation);
-                        }
-
-                    }
-
-                    if (donationData.length == 2) {
-                        String itemName = donationData[0];
-                        int quantity = Integer.parseInt(donationData[1]);
-                        DonatedItem item = new DonatedItem(itemName, quantity);
-
-                        // Add item to the current Donation
-                        currentDonation.getItems().add(item);
-                    }
-
-                }
-            }
-        } catch (IOException e) {
-            System.out.println("Error reading donations from file: " + e.getMessage());
-        }
-    }
-
-    public HashMap<String, Donee> loadDoneesIntoMap() {
-
+        HashMapInterface<String, Donation> donationMap = retrieveDonations();
         HashMap<String, Donee> doneeMap = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("donee.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] doneeData = line.split(",");
-                if (doneeData.length == 4) {
+                if (doneeData.length >= 4) {
                     Donee donee = new Donee(doneeData[0], doneeData[1], doneeData[2], doneeData[3]);
-                    doneeMap.put(donee.getId(), donee);
+
+                    
+                    if (doneeData.length > 4 && !doneeData[4].trim().isEmpty()) {
+                        String[] donationIDs = doneeData[4].split(";");
+                        for (String donationID : donationIDs) {
+          
+                             Donation donation = donationMap.get(donationID.trim());
+                            if (donation != null) {
+                                donee.addDonation(donation);
+                            }
+                        }
+                    }
+
+                    doneeMap.put(donee.getId(), donee); // Add donee to the map
                 }
             }
         } catch (IOException e) {
@@ -147,46 +120,130 @@ public class DoneeDAO {
         return doneeMap;
     }
 
-    public void loadDonationsIntoDonees(HashMap<String, Donee> doneeMap) {
+    //retrieve donation(HashMap)
+    public HashMapInterface<String, Donation> retrieveDonations() {
+        HashMapInterface<String, Donation> donationMap = new HashMap<>();
+
         try (BufferedReader reader = new BufferedReader(new FileReader("donation.txt"))) {
             String line;
-            Donee currentDonee = null;
-            Donation currentDonation = null;
+            String currentDonationId = null;
 
             while ((line = reader.readLine()) != null) {
                 line = line.trim();
+
                 if (line.isEmpty()) {
                     continue;
                 }
 
-                if (!line.startsWith("    ")) {
-                    String[] donationData = line.split(",");
-                    if (donationData.length == 3) {
-                        String doneeId = donationData[0];
-                        String description = donationData[1];
-                        double cashAmount = Double.parseDouble(donationData[2]);
+                String[] data = line.split(",");
 
-                        currentDonee = doneeMap.get(doneeId);
-                        if (currentDonee != null) {
-                            currentDonation = new Donation(description, cashAmount);
-                            currentDonee.addDonation(currentDonation);
-                        }
-                    } else if (donationData.length == 2) {
-                        String itemName = donationData[0];
-                        int quantity = Integer.parseInt(donationData[1]);
+                if (data.length == 3) {
+                    // Donation record
+                    String donationId = data[0];
+                    String description = data[1];
+                    double cashAmount = Double.parseDouble(data[2]);
+                    currentDonationId = donationId;
+
+                    // Create or update donation record
+                    Donation donation = donationMap.get(donationId);
+                    if (donation == null) {
+                        donation = new Donation(donationId, description, cashAmount);
+                        donationMap.put(donationId, donation);
+                    } else {
+                        // Update description and amount if donation already exists
+                        donation.setDescription(description);
+                        donation.setCashAmount(cashAmount);
+                    }
+                } else if (data.length == 2) {
+                    // Donated item
+                    String itemName = data[0];
+                    int quantity = Integer.parseInt(data[1]);
+
+                    // Find existing donation
+                    Donation donation = donationMap.get(currentDonationId);
+                    if (donation != null) {
                         DonatedItem item = new DonatedItem(itemName, quantity);
-
-                        if (currentDonation != null) {
-                            currentDonation.getItems().add(item);
-                        }
+                        donation.getItems().add(item);
                     }
                 }
             }
         } catch (IOException e) {
             System.out.println("Error reading donations from file: " + e.getMessage());
         }
+
+        return donationMap;
     }
 
+    //Retrieve Donation(Array)
+    public ListInterface<Donation> retrieveDonations(ListInterface<Donee> doneeList) {
+        ListInterface<Donation> donationList = new ArrayList<>();
+        HashMapInterface<String, Donation> donationMap = new HashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("donation.txt"))) {
+            String line;
+            String existId = null;
+
+            while ((line = reader.readLine()) != null) {
+
+                line = line.trim();
+
+                if (line.isEmpty()) {
+                    continue;
+                }
+
+                String[] data = line.split(",");
+
+                if (data.length == 3) {
+                    String donationId = data[0];
+                    String description = data[1];
+                    double cashAmount = Double.parseDouble(data[2]);
+                    existId = donationId;
+
+                    // Create or update donation record
+                    Donation donation = donationMap.get(donationId);
+                    if (donation == null) {
+                        donation = new Donation(donationId, description, cashAmount);
+                        donationList.add(donation);
+                        donationMap.put(donationId, donation);
+                    } else {
+                        // Update description and amount if donation already exists
+                        donation.setDescription(description);
+                        donation.setCashAmount(cashAmount);
+                    }
+                } else if (data.length == 2) {
+           
+                    String itemName = data[0];
+                    int quantity = Integer.parseInt(data[1]);
+
+                    // Find existing donation
+                    Donation donation = donationMap.get(existId);
+                    if (donation != null) {
+                        DonatedItem item = new DonatedItem(itemName, quantity);
+                        donation.getItems().add(item);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading donations from file: " + e.getMessage());
+        }
+
+        //Remove donations already taken by donees
+        for (int i = 0; i < doneeList.size(); i++) {
+            Donee donee = doneeList.getEntry(i);
+            ListInterface<Donation> doneeDonations = donee.getDonations();
+            for (int j = 0; j < doneeDonations.size(); j++) {
+                Donation doneeDonation = doneeDonations.getEntry(j);
+                if (doneeDonation != null) {
+                    donationMap.remove(doneeDonation.getDonationId());
+                    donationList.remove(doneeDonation);
+                }
+            }
+        }
+
+        return donationList;
+    }
+   
+   
     private Donee findDoneeById(ListInterface<Donee> doneeList, String id) {
         for (int i = 0; i < doneeList.size(); i++) {
             Donee donee = doneeList.getEntry(i);
