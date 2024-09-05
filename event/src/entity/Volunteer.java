@@ -29,7 +29,11 @@ public class Volunteer implements Comparable<Volunteer> {
         this.email = email;  
         this.events = new ArrayList<>();  
     }  
-
+    
+    public Volunteer(String id) {
+        this.id = id;
+        this.events = new ArrayList<>();
+    }
     // Getters and Setters  
     public String getId() {  
         return id;  

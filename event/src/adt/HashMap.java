@@ -122,13 +122,6 @@ public class HashMap<K, V> implements HashMapInterface<K, V> {
         return null;
     }
     
-    
-
-   
-
-
-    
-
     @Override
     public int size() {
         int size = 0;
@@ -140,6 +133,37 @@ public class HashMap<K, V> implements HashMapInterface<K, V> {
             }
         }
         return size;
+    }
+    
+    // Additional method: clear the map
+    public void clear() {
+        bucketArray = new HashMap[capacity];
+        size = 0;
+    }
+
+    // Additional method: check if a key is present
+    public boolean containsKey(K key) {
+        int index = hashFunction(key);
+        HashMap<K, V> current = bucketArray[index];
+        while (current != null) {
+            if (current.key.equals(key)) {
+                return true;
+            }
+            current = current.next;
+        }
+        return false;
+    }
+    
+    public HashSet<K> keySet() {
+        HashSet<K> keys = new HashSet<>();
+        for (HashMap<K, V> bucket : bucketArray) {
+            HashMap<K, V> current = bucket;
+            while (current != null) {
+                keys.add(current.key);
+                current = current.next;
+            }
+        }
+        return keys;
     }
 
 }

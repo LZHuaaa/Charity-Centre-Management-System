@@ -27,6 +27,9 @@ public class Event implements Comparable<Event> {
         this.location = location;  
         this.description = description;  
     }  
+    public Event(String id) {
+        this.id = id;
+    }
 
     // Getters and Setters  
     public String getId() {  
