@@ -4,8 +4,6 @@
  */
 package adt;
 
-import entity.Donee;
-
 /**
  *
  * @author leezh

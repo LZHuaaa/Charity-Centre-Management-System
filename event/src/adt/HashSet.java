@@ -4,10 +4,16 @@
  */
 package adt;
 
+import java.util.Iterator;
+
 /**
  *
  * @author eyong
  */
+
+
+import java.util.Iterator;  
+
 public class HashSet<T> implements HashSetInterface<T> {  
     private Object[] table;  
     private int size;  
@@ -91,4 +97,32 @@ public class HashSet<T> implements HashSetInterface<T> {
             table = newTable;  
         }  
     }  
-}
+
+    // Inner class to implement Iterator  
+    private class HashSetIterator implements Iterator<T> {  
+        private int currentIndex = 0;  
+        private int elementsReturned = 0;  
+
+        @Override  
+        public boolean hasNext() {  
+            return elementsReturned < size; // Check if there are more elements  
+        }  
+
+        @Override  
+        public T next() {  
+            while (currentIndex < table.length) {  
+                if (table[currentIndex] != null) {  
+                    elementsReturned++;  
+                    return (T) table[currentIndex++]; // Return the current element and move to the next  
+                }  
+                currentIndex++;  
+            }  
+            throw new java.util.NoSuchElementException("No more elements in the HashSet.");  
+        }  
+    }  
+
+    // Method to return an iterator  
+    public Iterator<T> iterator() {  
+        return new HashSetIterator();  
+    }  
+}  
