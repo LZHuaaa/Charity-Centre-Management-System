@@ -10,21 +10,11 @@ package adt;
  */
 public interface HashMapInterface<K, V> {
 
-    // Adds a key-value pair to the map
     void put(K key, V value);
-
-    // Removes a key-value pair by key
-    //void remove(K key);
-    // Retrieves a value by key
     V get(K key);
     V get(int key);
-
     boolean remove(K key);
     V removeValue(K key);
-
-    // Checks if a key is present in the map
-    //boolean containsKey(K key);
-    // Returns the number of key-value pairs in the map
     int size();
 
     

@@ -1,6 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/**
+ *
+ * @author Lee Zhi Hua
  */
 package boundary;
 
@@ -10,10 +10,7 @@ import adt.*;
 import control.doneeMaintenance;
 import dao.*;
 
-/**
- *
- * @author leezh
- */
+
 public class DoneeUI {
 
     private DoneeDAO doneeDAO = new DoneeDAO();
@@ -494,10 +491,30 @@ public class DoneeUI {
         System.out.println("Filter Donees");
         System.out.println("1. Filter by Donee Type");
         System.out.println("2. Filter by Donation");
+        System.out.println("3. Sort by Donee Type (Ascending / Descending order)");
         System.out.println("0. Exit");
         System.out.print("Enter your choice: ");
 
         int choice = -1;
+        while (choice < 0 || choice > 3) {
+
+            choice = scanner.nextInt();
+            if (choice < 0 || choice > 3) {
+                System.out.println("Invalid choice. Please select again.");
+            }
+        }
+        return choice;
+
+    }
+    
+    public int sortByType(){
+        System.out.println("\nSelect the sorting order");
+        System.out.println("1. Ascending order");
+        System.out.println("2. Descending order");
+        System.out.println("0. Exit");
+        System.out.print("Enter your choice: ");
+        
+         int choice = -1;
         while (choice < 0 || choice > 2) {
 
             choice = scanner.nextInt();
@@ -506,7 +523,7 @@ public class DoneeUI {
             }
         }
         return choice;
-
+       
     }
 
     public int displaySortMenu() {

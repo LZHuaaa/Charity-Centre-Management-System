@@ -10,7 +10,7 @@ import java.io.*;
 
 /**
  *
- * @author leezh
+ * @author Lee Zhi Hua
  */
 public class DoneeDAO {
 

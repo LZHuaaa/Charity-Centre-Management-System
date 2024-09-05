@@ -8,16 +8,14 @@ package adt;
  *
  * @author leezh
  */
-
-
 public class ArrayList<T> implements ListInterface<T> {
 
-    private T[] array ;
+    private T[] array;
     private int size = 0;
     private static final int CAPACITY = 50;
-    
-   public ArrayList() {
-        array = (T[]) new Object[CAPACITY]; 
+
+    public ArrayList() {
+        array = (T[]) new Object[CAPACITY];
     }
 
     @Override
@@ -27,11 +25,9 @@ public class ArrayList<T> implements ListInterface<T> {
             checkCapacity();
             array[size++] = element;
             return true;
-
         }
 
         return false;
-
     }
 
     @Override
@@ -169,7 +165,8 @@ public class ArrayList<T> implements ListInterface<T> {
         }
     }
 
-    private void checkCapacity() {
+    @Override
+    public void checkCapacity() {
         if (size == array.length) {
             int newCapacity = array.length * 2;
             T[] newArray = (T[]) new Object[newCapacity];
@@ -183,7 +180,8 @@ public class ArrayList<T> implements ListInterface<T> {
 
     }
 
-    private boolean validateIndex(int index) {
+    @Override
+    public boolean validateIndex(int index) {
         if (index < 0 || index > size) {
             throw new IndexOutOfBoundsException("The position should within" + size);
 
@@ -192,7 +190,8 @@ public class ArrayList<T> implements ListInterface<T> {
         return true;
     }
 
-    private boolean validateItem(T element) {
+    @Override
+    public boolean validateItem(T element) {
         if (element == null) {
             throw new IllegalArgumentException("cannot be null.");
 
@@ -201,4 +200,5 @@ public class ArrayList<T> implements ListInterface<T> {
         return true;
     }
 
+   
 }

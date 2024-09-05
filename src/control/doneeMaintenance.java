@@ -1,6 +1,5 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+author: Lee Zhi Hua
  */
 package control;
 
@@ -149,11 +148,14 @@ public class doneeMaintenance {
             case 2:
                 doneeUI.filterDoneesByDonationAmount();
                 break;
+            case 3:
+                runSortDonee();
+                break;
         }
     }
 
     public void runFilterDonee() {
-       
+
         int choice = 0;
         do {
             choice = doneeUI.displaySortMenu();
@@ -174,6 +176,64 @@ public class doneeMaintenance {
                     System.out.println("Invalid choice! Please try again.");
             }
         } while (choice != 0);
+    }
+
+    public void runSortDonee() {
+        int choice = doneeUI.sortByType();
+
+        switch (choice) {
+            case 1:
+                displaySortedDoneesByType();
+                break;
+            case 2:
+                reverseDoneeList();
+                break;
+            case 0:
+                break;
+
+        }
+
+    }
+
+    public void reverseDoneeList() {
+        doneeList.reverse();
+        System.out.println("\nDonee list has been reversed:");
+        doneeUI.printDoneesTable(doneeList);
+        runSortDonee();
+    }
+
+    public void displaySortedDoneesByType() {
+        sortDoneeListByType();
+        System.out.println("\nSorted Donees by Type:");
+        doneeUI.printDoneesTable(doneeList);
+        runSortDonee();
+
+    }
+
+    private int getTypePriority(String type) {
+        switch (type) {
+            case "Individual":
+                return 1;
+            case "Family":
+                return 2;
+            case "Organization":
+                return 3;
+            default:
+                return 4;
+        }
+    }
+
+    public void sortDoneeListByType() {
+        for (int i = 0; i < doneeList.size() - 1; i++) {
+            for (int j = 0; j < doneeList.size() - 1 - i; j++) {
+                Donee donee1 = doneeList.getEntry(j);
+                Donee donee2 = doneeList.getEntry(j + 1);
+                if (getTypePriority(donee1.getType()) > getTypePriority(donee2.getType())) {
+                    doneeList.replace(j, donee2);
+                    doneeList.replace(j + 1, donee1);
+                }
+            }
+        }
     }
 
     public void displaySortedDoneesByType(String type) {
@@ -241,8 +301,6 @@ public class doneeMaintenance {
             return false;
         }
     }
-
- 
 
     public void filterDoneesByDonationAmount(double minAmount, double maxAmount) {
         ListInterface<Donee> filteredList = new ArrayList<>();
