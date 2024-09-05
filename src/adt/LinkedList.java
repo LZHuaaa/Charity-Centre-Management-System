@@ -1,18 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/**
+ *
+ * @author Lee Zhi Hua
  */
 package adt;
 
-/**
- *
- * @author leezh
- */
+
 public class LinkedList<T> implements LinkedListInterface<T> {
 
     private Node<T> head;
     private int size;
 
+    // Inner Node class
     private static class Node<T> {
         T data;
         Node<T> next;
@@ -30,7 +28,9 @@ public class LinkedList<T> implements LinkedListInterface<T> {
 
     @Override
     public boolean add(T element) {
-        if (element == null) return false;
+        if (element == null) {
+            return false;
+        }
 
         Node<T> newNode = new Node<>(element);
 
@@ -49,7 +49,9 @@ public class LinkedList<T> implements LinkedListInterface<T> {
 
     @Override
     public boolean add(int index, T newEntry) {
-        if (index < 0 || index > size || newEntry == null) return false;
+        if (index < 0 || index > size || newEntry == null) {
+            return false;
+        }
 
         Node<T> newNode = new Node<>(newEntry);
 
@@ -71,7 +73,9 @@ public class LinkedList<T> implements LinkedListInterface<T> {
 
     @Override
     public T remove(int index) {
-        if (index < 0 || index >= size) return null;
+        if (index < 0 || index >= size) {
+            return null;
+        }
 
         Node<T> current = head;
         if (index == 0) {
@@ -90,8 +94,36 @@ public class LinkedList<T> implements LinkedListInterface<T> {
     }
 
     @Override
+    public boolean remove(T element) {
+        if (head == null || element == null) {
+            return false;
+        }
+
+        Node<T> current = head;
+        Node<T> previous = null;
+
+        while (current != null) {
+            if (current.data.equals(element)) {
+                if (previous == null) {
+                    head = current.next;  // Remove head
+                } else {
+                    previous.next = current.next;  // Bypass the node to remove
+                }
+                size--;
+                return true;
+            }
+            previous = current;
+            current = current.next;
+        }
+
+        return false;  // Element not found
+    }
+
+    @Override
     public T getEntry(int index) {
-        if (index < 0 || index >= size) return null;
+        if (index < 0 || index >= size) {
+            return null;
+        }
 
         Node<T> current = head;
         for (int i = 0; i < index; i++) {
@@ -102,7 +134,9 @@ public class LinkedList<T> implements LinkedListInterface<T> {
 
     @Override
     public T replace(int index, T newEntry) {
-        if (index < 0 || index >= size || newEntry == null) return null;
+        if (index < 0 || index >= size || newEntry == null) {
+            return null;
+        }
 
         Node<T> current = head;
         for (int i = 0; i < index; i++) {
@@ -144,7 +178,9 @@ public class LinkedList<T> implements LinkedListInterface<T> {
 
     @Override
     public int indexOf(T element) {
-        if (element == null) return -1;
+        if (element == null) {
+            return -1;
+        }
 
         Node<T> current = head;
         int index = 0;
@@ -162,7 +198,9 @@ public class LinkedList<T> implements LinkedListInterface<T> {
 
     @Override
     public int lastIndexOf(T element) {
-        if (element == null) return -1;
+        if (element == null) {
+            return -1;
+        }
 
         Node<T> current = head;
         int lastIndex = -1;

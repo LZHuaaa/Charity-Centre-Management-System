@@ -1,13 +1,9 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
+author Lee Zhi Hua
  */
 package adt;
 
-/**
- *
- * @author leezh
- */
+
 public interface LinkedListInterface<T> {
 
     boolean add(T element);
@@ -15,6 +11,8 @@ public interface LinkedListInterface<T> {
     boolean add(int index, T newEntry);
 
     T remove(int index);
+
+    boolean remove(T element);
 
     T getEntry(int index);
 

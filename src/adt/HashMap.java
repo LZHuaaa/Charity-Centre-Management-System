@@ -1,15 +1,10 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/*@author Lee Zhi Hua
  */
 package adt;
 
 import entity.Donee;
 
-/**
- *
- * @author leezh
- */
+
 public class HashMap<K, V> implements HashMapInterface<K, V> {
 
     private K key;

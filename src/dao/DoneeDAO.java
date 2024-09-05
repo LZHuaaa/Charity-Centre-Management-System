@@ -30,7 +30,8 @@ public class DoneeDAO {
                 Donee donee = doneeList.getEntry(i);
                 StringBuilder donationIds = new StringBuilder();
 
-                ListInterface<Donation> donations = donee.getDonations();
+                
+                LinkedListInterface<Donation> donations = donee.getDonations();
                 for (int j = 0; j < donations.size(); j++) {
                     Donation donation = donations.getEntry(j);
                     donationIds.append(donation.getDonationId());
@@ -175,8 +176,8 @@ public class DoneeDAO {
     }
 
     //Retrieve Donation(Array)
-    public ListInterface<Donation> retrieveDonations(ListInterface<Donee> doneeList) {
-        ListInterface<Donation> donationList = new ArrayList<>();
+    public LinkedListInterface<Donation> retrieveDonations(ListInterface<Donee> doneeList) {
+        LinkedListInterface<Donation> donationList = new LinkedList<>();
         HashMapInterface<String, Donation> donationMap = new HashMap<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("donation.txt"))) {
@@ -230,7 +231,8 @@ public class DoneeDAO {
         //Remove donations already taken by donees
         for (int i = 0; i < doneeList.size(); i++) {
             Donee donee = doneeList.getEntry(i);
-            ListInterface<Donation> doneeDonations = donee.getDonations();
+            //ListInterface<Donation> doneeDonations = donee.getDonations();
+            LinkedListInterface<Donation> doneeDonations = donee.getDonations();
             for (int j = 0; j < doneeDonations.size(); j++) {
                 Donation doneeDonation = doneeDonations.getEntry(j);
                 if (doneeDonation != null) {

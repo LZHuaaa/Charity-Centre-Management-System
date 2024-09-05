@@ -12,11 +12,10 @@ import utility.*;
 public class doneeMaintenance {
 
     private ListInterface<Donee> doneeList = new ArrayList<>();
-    private ListInterface<Donation> donationList = new ArrayList<>();
+    private LinkedListInterface<Donation> donationList = new LinkedList<>();
+    public HashMap<String, Donee> doneeMap = new HashMap<>();
     private DoneeDAO doneeDAO = new DoneeDAO();
     private DoneeUI doneeUI = new DoneeUI();
-    public HashMap<String, Donee> doneeMap = new HashMap<>();
-    private HashMap<String, Donation> donationMap = new HashMap<>();
 
     public doneeMaintenance() {
         loadAllFromFile();
@@ -83,12 +82,11 @@ public class doneeMaintenance {
 
             doneeList.remove(donee);
 
-            ListInterface<Donation> doneeDonations = donee.getDonations();
+            LinkedListInterface<Donation> doneeDonations = donee.getDonations();
 
             for (int i = 0; i < doneeDonations.size(); i++) {
                 Donation donation = doneeDonations.getEntry(i);
                 donationList.add(donation);
-                donationMap.put(donation.getDonationId(), donation);
 
             }
 
@@ -105,7 +103,7 @@ public class doneeMaintenance {
         doneeUI.updateDoneeDetails(doneeMap, donationList);
     }
 
-    public boolean updateDonee(String doneeId, String name, String type, String contactNo, ArrayList<Donation> selectedDonations) {
+    public boolean updateDonee(String doneeId, String name, String type, String contactNo, LinkedList<Donation> selectedDonations) {
         doneeMap = doneeDAO.loadDoneesIntoMap();
         Donee donee = doneeMap.get(doneeId);
 
@@ -309,7 +307,7 @@ public class doneeMaintenance {
             Donee donee = doneeList.getEntry(i);
             double totalDonationAmount = 0.0;
 
-            ListInterface<Donation> donations = donee.getDonations();
+            LinkedListInterface<Donation> donations = donee.getDonations();
             for (int j = 0; j < donations.size(); j++) {
                 Donation donation = donations.getEntry(j);
                 totalDonationAmount += donation.getCashAmount();

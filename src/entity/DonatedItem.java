@@ -1,16 +1,12 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * @author Lee Zhi Hua
  */
 package entity;
 
 import java.util.Objects;
 
 
-/**
- *
- * @author leezh
- */
+
 public class DonatedItem {
 
    

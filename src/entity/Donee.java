@@ -1,6 +1,5 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ * @author Lee Zhi Hua
  */
 package entity;
 
@@ -19,13 +18,11 @@ public class Donee implements Comparable<Donee> {
     private String name;
     private String type;
     private String contactNo;
-    private ArrayList<Donation> donations;
-    
-     public Donee() {
-       
+    private LinkedList<Donation> donations;
+
+    public Donee() {
+
     }
-     
-     
 
     public Donee(String id, String name, String type, String contactNo) {
 
@@ -33,7 +30,8 @@ public class Donee implements Comparable<Donee> {
         this.name = name;
         this.type = type;
         this.contactNo = contactNo;
-        this.donations = new ArrayList<>();
+        this.donations = new LinkedList<>();
+
     }
 
     // Getters and Setters
@@ -69,35 +67,17 @@ public class Donee implements Comparable<Donee> {
         this.contactNo = contactNo;
     }
 
-    public ArrayList<Donation> getDonations() {
+    public LinkedList<Donation> getDonations() {
         return donations;
     }
 
-    public void setDonations(ArrayList<Donation> donations) {
+    public void setDonations(LinkedList<Donation> donations) {
         this.donations = donations;
     }
 
     // Methods
     public void addDonation(Donation donation) {
         donations.add(donation);
-    }
-
-    public void removeDonation(Donation donation) {
-        donations.remove(donation);
-    }
-
-    public void updateDonation(Donation oldDonation, Donation newDonation) {
-        int index = -1;
-        for (int i = 0; i < donations.size(); i++) {
-            if (donations.getEntry(i).equals(oldDonation)) {
-                index = i;
-                break;
-            }
-        }
-        if (index != -1) {
-            donations.remove(oldDonation);
-            donations.add(newDonation);
-        }
     }
 
     @Override

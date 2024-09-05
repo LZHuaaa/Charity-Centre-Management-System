@@ -1,3 +1,7 @@
+/*
+ * @author Lee Zhi Hua
+ */
+
 package entity;
 
 import adt.*;

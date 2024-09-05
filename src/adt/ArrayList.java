@@ -1,13 +1,8 @@
 /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+Created by Chia Yuxuan,Darren Tan Ke Yu,Kevin Er Yong Xian, Lee Zhi Hua
  */
 package adt;
 
-/**
- *
- * @author leezh
- */
 public class ArrayList<T> implements ListInterface<T> {
 
     private T[] array;
@@ -200,5 +195,4 @@ public class ArrayList<T> implements ListInterface<T> {
         return true;
     }
 
-   
 }
