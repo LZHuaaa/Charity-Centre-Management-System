@@ -1,9 +1,14 @@
+/**
+ *
+ * @author Chia Yuxuan
+ */
 package dao;
 
 import adt.*;
 import entity.*;
 import java.io.*;
 import java.util.Scanner;
+import utility.MessageUI;
 
 public class VolunteerDAO {
 
@@ -19,16 +24,16 @@ public class VolunteerDAO {
     }
 
     public void add(Volunteer volunteer) {
-        volunteer.setVolunteerId(generateNewId()); // Set a new ID before adding
+        volunteer.setVolunteerId(generateNewId()); 
         volunteers.add(volunteer);
-        saveToFile(); // Save the updated list to the file
+        saveToFile(); 
     }
 
     public boolean remove(String volunteerId) {
         Volunteer volunteer = get(volunteerId);
         if (volunteer != null) {
             volunteers.remove(volunteer);
-            saveToFile(); // Save the updated list to the file
+            saveToFile(); 
             return true;
         }
         return false;
@@ -49,11 +54,9 @@ public class VolunteerDAO {
     }
 
     public void update(Volunteer volunteer) {
-        // We don't need to update the file in this method as the file is saved in add and remove
-        saveToFile(); // Save after any update
+        saveToFile();
     }
 
-    // Save volunteer data to file
     private void saveToFile() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME))) {
             for (int i = 0; i < volunteers.size(); i++) {
@@ -94,7 +97,6 @@ public class VolunteerDAO {
 
         for (int i = 0; i < volunteers.size(); i++) {
             Volunteer volunteer = volunteers.getEntry(i);
-            // Simple example: check if any attribute contains the criteria
             if (volunteer.getName().contains(criteria)
                     || volunteer.getEmail().contains(criteria)) {
                 filteredVolunteers.add(volunteer);
@@ -104,7 +106,6 @@ public class VolunteerDAO {
         return filteredVolunteers;
     }
 
-    // Generate a new volunteer ID based on existing ones
     private String generateNewId() {
         int maxId = 0;
 
@@ -144,10 +145,7 @@ public class VolunteerDAO {
                     String location = parts[3].trim();
                     String description = parts[4].trim();
 
-                    // Create a new Event object
                     Event event = new Event(eventId, name, date, location, description);
-
-                    // Add the Event to the list
                     events.add(event);
                 }
             }
@@ -172,7 +170,7 @@ public class VolunteerDAO {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            //MessageUI.showError("Error loading assigned events.");
+            MessageUI.showError("Error loading assigned events.");
         }
         return assignedEvents;
     }
@@ -183,8 +181,45 @@ public class VolunteerDAO {
             writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
-
         }
     }
 
+        public ListInterface<Event> loadEventsForVolunteer(String volunteerId) {
+        ListInterface<Event> assignedEvents = new ArrayList<>(); // Initialize a new list to store assigned events
+
+        try (BufferedReader reader = new BufferedReader(new FileReader("volunteer_event.txt"))) {
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length == 2) {
+                    String fileVolunteerId = parts[0].trim();
+                    String eventId = parts[1].trim();
+
+                    if (fileVolunteerId.equals(volunteerId)) {
+                        // Fetch the Event object based on eventId
+                        Event event = findEventById(eventId);
+                        if (event != null) {
+                            assignedEvents.add(event); // Add the event to the list
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return assignedEvents;
+    }
+        
+    // Method to find event by eventId
+    public Event findEventById(String eventId) {
+        for (int i = 0; i < events.size(); i++) {
+            Event event = events.getEntry(i);
+            if (event.getEventId().equals(eventId)) {
+                return event;
+            }
+        }
+        return null;
+    }
 }

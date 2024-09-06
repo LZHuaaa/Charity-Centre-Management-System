@@ -1,4 +1,7 @@
-//author Chia Yuxuan
+/**
+ *
+ * @author Chia Yuxuan
+ */
 package entity;
 
 import adt.ArrayList;
@@ -58,55 +61,8 @@ public class Volunteer {
     public void addEvent(Event event) {
         events.add(event); // Add event to the list
     }
-    
+
+    public void setEvents(ListInterface<Event> assignedEvents) {
+        this.events = assignedEvents; // Store the assigned events in the Volunteer object   
+    }   
 }
-
-
-
-
-/**
-package entity;
-
-import adt.ListInterface;
-import adt.ArrayList;
-
-public class Volunteer {
-    private String volunteerId;
-    private String name;
-    private String contactNumber;
-    private String email;
-    private ListInterface<Event> events;
-
-    public Volunteer(String volunteerId, String name, String contactNumber, String email) {
-        this.volunteerId = volunteerId;
-        this.name = name;
-        this.contactNumber = contactNumber;
-        this.email = email;
-        this.events = new ArrayList<>();
-    }
-
-    public String getVolunteerId() {
-        return volunteerId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public ListInterface<Event> getEvents() {
-        return events;
-    }
-
-    public void addEvent(Event event) {
-        events.add(event);
-    }
-}
-**/

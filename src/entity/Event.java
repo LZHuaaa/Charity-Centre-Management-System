@@ -1,3 +1,7 @@
+/**
+ *
+ * @author Chia Yuxuan
+ */
 package entity;
 
 public class Event {
@@ -20,7 +24,6 @@ public class Event {
             throw new IllegalArgumentException("Event ID cannot be null or empty.");
         }
         this.eventId = eventId;
-        // Initialize other properties if needed
     }
 
 

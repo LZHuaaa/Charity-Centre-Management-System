@@ -1,4 +1,7 @@
-
+/**
+ *
+ * @author Chia Yuxuan
+ */
 package control;
 
 import adt.*;
@@ -18,24 +21,21 @@ public class VolunteerMaintenance {
         volunteerDAO = new VolunteerDAO(); // Initializes VolunteerDAO and loads from file
     }
     
-    // Add a new volunteer and save to file
     public void addVolunteer(Volunteer volunteer) {
         volunteerDAO.add(volunteer);
-        MessageUI.showInfo("Volunteer added successfully!");
+        MessageUI.showInfo("\n\nVolunteer added successfully!");
     }
 
-    // Remove a volunteer by ID and save to file
     public boolean removeVolunteer(String volunteerId) {
         boolean success = volunteerDAO.remove(volunteerId);
         if (success) {
-            MessageUI.showInfo("Volunteer removed successfully!");
+            MessageUI.showInfo("\nVolunteer removed successfully!");
         } else {
             MessageUI.showError("Volunteer ID not found.");
         }
         return success;
     }
 
-    // Search a volunteer by ID
     public Volunteer searchVolunteer(String volunteerId) {
         Volunteer volunteer = volunteerDAO.get(volunteerId);
         if (volunteer != null) {
@@ -46,26 +46,13 @@ public class VolunteerMaintenance {
         }
     }
 
-    // Assign an event to a volunteer by ID and save to file
     public void assignEventToVolunteer(String volunteerId, Event event) {
         Volunteer volunteer = volunteerDAO.get(volunteerId);
         if (volunteer != null) {
             volunteer.addEvent(event);
             volunteerDAO.update(volunteer); // Save updated volunteer details
-            MessageUI.showInfo("Event assigned to volunteer successfully!");
-        } else {
-            MessageUI.showError("Volunteer ID not found.");
-        }
+        } 
     }
-
-    // List all events assigned to a volunteer
-    /*public ListInterface<Event> searchEventsUnderVolunteer(String volunteerId) {
-        Volunteer volunteer = volunteerDAO.get(volunteerId);
-        if (volunteer != null) {
-            return volunteer.getEvents();
-        }
-        return null;
-    }*/
     
     public ListInterface<Event> searchEventsUnderVolunteer(String volunteerId) {
     ListInterface<Event> assignedEvents = new ArrayList<>(); // Initialize a new list to store assigned events
@@ -109,18 +96,14 @@ public Event findEventById(String eventId) {
     return null; // Return null if no event is found
 }
 
-
-    // List all volunteers
     public ListInterface<Volunteer> listAllVolunteers() {
         return volunteerDAO.getAllVolunteers();
     }
 
-    // Filter volunteers based on criteria (e.g., name, email)
     public ListInterface<Volunteer> filterVolunteers(String criteria) {
         return volunteerDAO.filter(criteria);
     }
 
-    // Generate a detailed report of all volunteers and events
     public void generateDetailedReport() {
         ListInterface<Volunteer> volunteers = volunteerDAO.getAllVolunteers();
         if (volunteers.isEmpty()) {
@@ -133,13 +116,17 @@ public Event findEventById(String eventId) {
         StringBuilder reportBuilder = new StringBuilder();
 
         reportBuilder.append("\nSummary Report\n");
-        reportBuilder.append("-------------------------------------------------------------------------------------------\n");
+        reportBuilder.append("---------------------------------------------------------------------------------\n");
         reportBuilder.append(String.format("%-15s %-20s %-15s %-30s\n", "Volunteer ID", "Name", "Contact Number", "Email"));
-        reportBuilder.append("-------------------------------------------------------------------------------------------\n");
+        reportBuilder.append("---------------------------------------------------------------------------------\n");
 
-        // Collecting data for each volunteer and events
         for (int i = 0; i < volunteers.size(); i++) {
             Volunteer volunteer = volunteers.getEntry(i);
+            
+             // Load the volunteer's assigned events from the volunteer_event.txt file
+            ListInterface<Event> assignedEvents = searchEventsUnderVolunteer(volunteer.getVolunteerId());
+            volunteer.setEvents(assignedEvents); // Set the events in the volunteer object
+            
             totalEvents += volunteer.getEvents().size();
             reportBuilder.append(String.format("%-15s %-20s %-15s %-30s\n", 
                 volunteer.getVolunteerId(), 
@@ -148,12 +135,11 @@ public Event findEventById(String eventId) {
                 volunteer.getEmail()));
         }
 
-        reportBuilder.append("\n-------------------------------------------------------------------------------------------\n");
+        reportBuilder.append("\n---------------------------------------------------------------------------------\n");
         reportBuilder.append("Total Volunteers: ").append(totalVolunteers).append("\n");
         reportBuilder.append("Total Events Assigned: ").append(totalEvents).append("\n");
-        reportBuilder.append("-------------------------------------------------------------------------------------------\n\n");
+        reportBuilder.append("---------------------------------------------------------------------------------\n\n");
 
-        // Detailed event assignment section
         for (int i = 0; i < volunteers.size(); i++) {
             Volunteer volunteer = volunteers.getEntry(i);
             reportBuilder.append(String.format("Volunteer ID: %-15s Name: %-20s\n", 
@@ -177,7 +163,7 @@ public Event findEventById(String eventId) {
             } else {
                 reportBuilder.append("No events assigned.\n");
             }
-            reportBuilder.append("-------------------------------------------------------------------------------------------\n");
+            reportBuilder.append("-------------------------------------------------------------------------------------------------------------------------------------------------------\n");
         }
 
         MessageUI.showInfo(reportBuilder.toString());

@@ -1,3 +1,7 @@
+/**
+ *
+ * @author Chia Yuxuan
+ */
 package boundary;
 
 import control.VolunteerMaintenance;
@@ -10,7 +14,7 @@ import java.util.regex.Pattern;
 import dao.*;
 
 public class VolunteerUI {
-
+    
     private VolunteerMaintenance volunteerMaintenance;
     private Scanner scanner;
     private int volunteerCounter = 1; // To generate new IDs like V001, V002
@@ -117,7 +121,7 @@ public class VolunteerUI {
             Volunteer volunteer = new Volunteer(volunteerId, name, contactNumber, email);
             volunteerMaintenance.addVolunteer(volunteer);
 
-            MessageUI.showSuccess("Volunteer added successfully.");
+            //MessageUI.showSuccess("Volunteer added successfully.");
             displayVolunteerDetails(volunteer);
 
             continueAdding = promptContinue("\nDo you want to add another volunteer? (yes/no): ");
@@ -137,20 +141,18 @@ public class VolunteerUI {
     }
 
     private void removeVolunteer() {
-        // Check if there are any volunteers in the system initially
         if (volunteerMaintenance.listAllVolunteers().isEmpty()) {
             MessageUI.showInfo("\nNo volunteers available to remove. Please add a new volunteer first.");
             if (promptContinue("\nWould you like to add a new volunteer now? (yes/no): ")) {
                 addVolunteer();
             }
             MessageUI.showInfo("Returning to the main menu...");
-            return; // Exit the method if no volunteers are available
+            return; 
         } else {
-        }
+    }
 
         boolean continueRemoving = true;
         while (continueRemoving) {
-            // Check if there are volunteers before asking for ID
             if (!volunteerMaintenance.listAllVolunteers().isEmpty()) {
                 String id = getInput("\nEnter Volunteer ID: ").trim();
 
@@ -161,24 +163,21 @@ public class VolunteerUI {
                     if (promptContinue("\nAre you sure you want to remove this volunteer? (yes/no): ")) {
                         boolean success = volunteerMaintenance.removeVolunteer(id);
                         if (success) {
-                            MessageUI.showSuccess("Volunteer removed successfully.");
+                            //MessageUI.showSuccess("Volunteer removed successfully.");
                         } else {
                             MessageUI.showError("Failed to remove volunteer.");
                         }
                     } else {
                         MessageUI.showInfo("Volunteer removal canceled.");
                     }
-                } else {
-                    MessageUI.showError("Volunteer not found. Please try again.");
-                }
+                } 
             } else {
-                // When no more volunteers are available
                 MessageUI.showInfo("\nNo more volunteers available to remove.");
                 if (promptContinue("\nWould you like to add a new volunteer now? (yes/no): ")) {
                     addVolunteer();
                 }
                 MessageUI.showInfo("Returning to the main menu...");
-                return; // Exit the method after volunteer is added or declined
+                return; 
             }
 
             continueRemoving = promptContinue("\nDo you want to remove another volunteer? (yes/no): ");
@@ -186,7 +185,6 @@ public class VolunteerUI {
     }
 
     private void searchVolunteer() {
-        // Check if there are any volunteers in the system
         if (volunteerMaintenance.listAllVolunteers().isEmpty()) {
             MessageUI.showInfo("\nNo volunteers available to search. Please add a new volunteer first.");
             if (promptContinue("\nWould you like to add a new volunteer now? (yes/no): ")) {
@@ -202,115 +200,16 @@ public class VolunteerUI {
 
             Volunteer volunteer = volunteerMaintenance.searchVolunteer(id);
             if (volunteer != null) {
-                displayVolunteerDetails(volunteer);
-            } else {
-                MessageUI.showError("Volunteer not found.");
-                if (promptContinue("\nNo volunteer found. Would you like to add a new volunteer? (yes/no): ")) {
-                    addVolunteer();
-                    return; // After adding a volunteer, return to the main menu
-                }
+                displayVolunteerDetails(volunteer);            
             }
 
-            continueSearching = promptContinue("\nDo you want to search for another volunteer? (yes/no): ");
+            continueSearching = promptContinue("Do you want to search for another volunteer? (yes/no): ");
         }
     }
 
-    /* private void assignEventToVolunteer() {
-        if (volunteerMaintenance.listAllVolunteers().isEmpty()) {
-            MessageUI.showInfo("\nNo volunteers available. Please add a new volunteer first.");
-            if (promptContinue("\nWould you like to add a new volunteer now? (yes/no): ")) {
-                addVolunteer();
-            }
-            MessageUI.showInfo("Returning to the main menu...");
-            return;
-        }
-
-        boolean continueAssigning = true;
-        while (continueAssigning) {
-            String volunteerId = "";
-
-            while (volunteerId.isEmpty()) {
-                System.out.print("\nEnter Volunteer ID: ");
-                volunteerId = scanner.nextLine().trim();
-                if (volunteerId.isEmpty()) {
-                    MessageUI.showError("Volunteer ID cannot be empty. Please enter a valid Volunteer ID.\n");
-                }
-            }
-
-            Volunteer volunteer = volunteerMaintenance.searchVolunteer(volunteerId);
-            if (volunteer != null) {
-                boolean continueAddingEvents = true;
-                do {
-                    String eventId = "";
-                    String eventName = "";
-                    String eventDate = "";
-                    String eventLocation = "";
-                    String eventDescription = "";
-
-                    while (eventId.isEmpty()) {
-                        System.out.print("Enter Event ID: ");
-                        eventId = scanner.nextLine().trim();
-                        if (eventId.isEmpty()) {
-                            MessageUI.showError("Event ID cannot be empty. Please enter a valid Event ID.\n");
-                        }
-                    }
-
-                    while (eventName.isEmpty()) {
-                        System.out.print("Enter Event Name: ");
-                        eventName = scanner.nextLine().trim();
-                        if (eventName.isEmpty()) {
-                            MessageUI.showError("Event Name cannot be empty. Please enter a valid Event Name.\n");
-                        }
-                    }
-
-                    while (eventDate.isEmpty()) {
-                        System.out.print("Enter Event Date: ");
-                        eventDate = scanner.nextLine().trim();
-                        if (eventDate.isEmpty()) {
-                            MessageUI.showError("Event Date cannot be empty. Please enter a valid Event Date.\n");
-                        }
-                    }
-
-                    while (eventLocation.isEmpty()) {
-                        System.out.print("Enter Event Location: ");
-                        eventLocation = scanner.nextLine().trim();
-                        if (eventLocation.isEmpty()) {
-                            MessageUI.showError("Event Location cannot be empty. Please enter a valid Event Location.\n");
-                        }
-                    }
-
-                    while (eventDescription.isEmpty()) {
-                        System.out.print("Enter Event Description: ");
-                        eventDescription = scanner.nextLine().trim();
-                        if (eventDescription.isEmpty()) {
-                            MessageUI.showError("Event Description cannot be empty. Please enter a valid Event Description.\n");
-                        }
-                    }
-
-                    Event event = new Event(eventId, eventName, eventDate, eventLocation, eventDescription);
-                    volunteerMaintenance.assignEventToVolunteer(volunteerId, event);
-                MessageUI.showSuccess("Event assigned to volunteer successfully.");
-
-                // Prompt to add more events
-                continueAddingEvents = promptContinue("\nDo you want to add more events to this volunteer? (yes/no): ");
-                 System.out.println();
-            } while (continueAddingEvents);
-        } else {
-            MessageUI.showError("Volunteer ID not found.");
-            if (promptContinue("\nNo volunteer found. Would you like to add a new volunteer? (yes/no): ")) {
-                addVolunteer();
-                return; // After adding a volunteer, return to the main menu
-            }
-        }
-
-        // Prompt to assign events to another volunteer
-        continueAssigning = promptContinue("Do you want to assign events to another volunteer? (yes/no): ");
-    }
-}*/
     private void assignEventToVolunteer() {
-
         VolunteerDAO da = new VolunteerDAO();
-        ListInterface<Event> events = da.loadEventsFromFile();
+        ListInterface<Event> events = da.loadEventsFromFile(); // Load all events from the file
 
         // Ensure there are volunteers before proceeding
         if (volunteerMaintenance.listAllVolunteers().isEmpty()) {
@@ -322,7 +221,6 @@ public class VolunteerUI {
             return;
         }
 
-        // Load already assigned events
         HashSet<String> assignedEvents = da.loadAssignedEvents();
 
         boolean continueAssigning = true;
@@ -340,49 +238,62 @@ public class VolunteerUI {
             Volunteer volunteer = volunteerMaintenance.searchVolunteer(volunteerId);
 
             if (volunteer != null) {
+                // Load the events already assigned to this specific volunteer
+                ListInterface<Event> assignedEventsForVolunteer = da.loadEventsForVolunteer(volunteerId);
+
                 boolean continueAddingEvents = true;
                 while (continueAddingEvents) {
-                    // Display the list of available events
-
+                    // Display the list of available events in columnar format
                     System.out.println("\nAvailable Events:");
+                    System.out.printf("%-15s %-30s %-12s %-20s %-50s%n", "Event ID", "Event Name", "Event Date", "Event Location", "Event Description");
+                    System.out.println("-----------------------------------------------------------------------------------------------------------------------------------------------------------");
+
                     for (int i = 0; i < events.size(); i++) {
                         Event e = events.getEntry(i);
-                        // Only display events that are not already assigned
-                        if (!assignedEvents.contains(e.getEventId())) {
-                            System.out.println(e.getEventId() + ": " + e.getName() + " on " + e.getDate() + " at " + e.getLocation());
+                        // Only display events not yet assigned to this specific volunteer
+                        if (!isEventAssignedToVolunteer(e.getEventId(), assignedEventsForVolunteer)) {
+                            System.out.printf("%-15s %-30s %-12s %-20s %-50s%n",
+                                    e.getEventId(),
+                                    e.getName(),
+                                    e.getDate(),
+                                    e.getLocation(),
+                                    e.getDescription());
                         }
                     }
 
                     String eventId = "";
                     while (eventId.isEmpty()) {
-                        System.out.print("Enter Event ID from the list above: ");
+                        System.out.print("\nEnter Event ID from the list above: ");
                         eventId = scanner.nextLine().trim();
                         if (eventId.isEmpty()) {
                             MessageUI.showError("Event ID cannot be empty. Please enter a valid Event ID.\n");
                         }
                     }
 
-                    // Check if the event is already assigned
-                    if (assignedEvents.contains(eventId)) {
-                        MessageUI.showError("This event has already been assigned. Please choose another event.");
+                    Event event = da.findEventById(eventId);
+
+                    if (volunteer.getEvents() != null && volunteer.getEvents().contains(event)) {
+                        MessageUI.showError("This event has already been assigned to this volunteer. Please choose another event.");
                         continue;
                     }
 
-                    Event event = findEventById(eventId);
                     if (event != null) {
-                        // Assign event to volunteer
-                        volunteerMaintenance.assignEventToVolunteer(volunteerId, event);
-                        MessageUI.showSuccess("Event assigned to volunteer successfully.");
+                        if (isEventAssignedToVolunteer(eventId, assignedEventsForVolunteer)) {
+                            MessageUI.showError("This event is already assigned to this volunteer. Please choose another event.");
+                        } else {
+                            volunteerMaintenance.assignEventToVolunteer(volunteerId, event);
 
-                        // Save the assignment to event_volunteer.txt
-                        da.saveEventVolunteerAssignment(volunteerId, eventId);
-                        // Add the assigned event to the set to avoid assigning it again
-                        assignedEvents.add(eventId);
+                            da.saveEventVolunteerAssignment(volunteerId, eventId);
+
+                            assignedEventsForVolunteer.add(event);
+
+                            System.out.println();
+                            MessageUI.showSuccess("Event assigned to volunteer successfully.");
+                        }
                     } else {
                         MessageUI.showError("Event ID not found. Please select a valid Event ID.");
                     }
 
-                    // Prompt to add more events
                     continueAddingEvents = promptContinue("\nDo you want to assign more events to this volunteer? (yes/no): ");
                     System.out.println();
                 }
@@ -390,54 +301,26 @@ public class VolunteerUI {
                 MessageUI.showError("Volunteer ID not found.");
                 if (promptContinue("\nNo volunteer found. Would you like to add a new volunteer? (yes/no): ")) {
                     addVolunteer();
-                    return; // After adding a volunteer, return to the main menu
+                    return; 
                 }
             }
 
-            // Prompt to assign events to another volunteer
             continueAssigning = promptContinue("Do you want to assign events to another volunteer? (yes/no): ");
         }
     }
 
-// Display the list of available events
-    private void displayEventsList() {
-        VolunteerDAO da = new VolunteerDAO();
-        ListInterface<Event> events = da.loadEventsFromFile(); // Assuming this method exists
-        if (events == null || events.isEmpty()) {
-            MessageUI.showInfo("No events available. Please add events first.");
-            return;
-        }
-
-        System.out.println("\nAvailable Events:");
-        System.out.println(String.format("%-10s %-25s %-15s %-20s %-30s", "Event ID", "Event Name", "Event Date", "Location", "Description"));
-        System.out.println("-----------------------------------------------------------------------------------");
-
-        for (int i = 0; i < events.size(); i++) {
-            Event event = events.getEntry(i);
-            System.out.println(String.format("%-10s %-25s %-15s %-20s %-30s",
-                    event.getEventId(),
-                    event.getName(),
-                    event.getDate(),
-                    event.getLocation(),
-                    event.getDescription()));
-        }
-    }
-
-// Find an event by ID
-    private Event findEventById(String eventId) {
-        VolunteerDAO da = new VolunteerDAO();
-        ListInterface<Event> events = da.loadEventsFromFile();// Assuming this method exists
-        for (int i = 0; i < events.size(); i++) {
-            Event event = events.getEntry(i);
-            if (event.getEventId().equals(eventId)) {
-                return event;
+    // Utility method to check if an event is already assigned to a volunteer
+    private boolean isEventAssignedToVolunteer(String eventId, ListInterface<Event> assignedEvents) {
+        if (assignedEvents == null) return false;
+        for (int i = 0; i < assignedEvents.size(); i++) {
+            if (assignedEvents.getEntry(i).getEventId().equals(eventId)) {
+                return true;
             }
         }
-        return null;
+        return false;
     }
 
     private void searchEventsUnderVolunteer() {
-        // Check if there are any volunteers in the system
         if (volunteerMaintenance.listAllVolunteers().isEmpty()) {
             MessageUI.showInfo("\nNo volunteers available. Please add a new volunteer first.");
             if (promptContinue("\nWould you like to add a new volunteer now? (yes/no): ")) {
@@ -454,24 +337,21 @@ public class VolunteerUI {
             ListInterface<Event> events = volunteerMaintenance.searchEventsUnderVolunteer(volunteerId);
             if (events != null && !events.isEmpty()) {
                 MessageUI.showInfo("\nEvents under volunteer:");
+                System.out.printf("%-15s %-30s %-12s %-20s %-50s%n", "Event ID", "Event Name", "Event Date", "Event Location", "Event Description");
+                System.out.println("-------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
                 for (int i = 0; i < events.size(); i++) {
                     Event event = events.getEntry(i);
-                    MessageUI.showInfo("Event ID: " + event.getEventId());
-                    MessageUI.showInfo("Event Name: " + event.getName());
-                    MessageUI.showInfo("Event Date: " + event.getDate());
-                    MessageUI.showInfo("Event Location: " + event.getLocation());
-                    MessageUI.showInfo("Event Description: " + event.getDescription());
-                    MessageUI.showInfo("---------------------------");
-                }
-            } else {
-                MessageUI.showError("No events found for this volunteer.");
-                if (promptContinue("\nNo events found. Would you like to add a new volunteer? (yes/no): ")) {
-                    addVolunteer();
-                    return; // After adding a volunteer, return to the main menu
+                    System.out.printf("%-15s %-30s %-12s %-20s %-50s%n",
+                            event.getEventId(),
+                            event.getName(),
+                            event.getDate(),
+                            event.getLocation(),
+                            event.getDescription());
                 }
             }
 
-            continueSearching = promptContinue("\nDo you want to search for events under another volunteer? (yes/no): ");
+            continueSearching = promptContinue("\nError: Volunteer ID is not found. Do you want to search for events under another volunteer? (yes/no): ");
         }
     }
 
@@ -484,14 +364,12 @@ public class VolunteerUI {
             }
             MessageUI.showInfo("Returning to the main menu...");
         } else {
-            // Prepare the columnar design header
             StringBuilder reportBuilder = new StringBuilder();
             reportBuilder.append("\nVolunteer List\n");
             reportBuilder.append("-----------------------------------------------------------------------\n");
             reportBuilder.append(String.format("%-15s %-20s %-15s %-30s\n", "Volunteer ID", "Name", "Contact Number", "Email"));
             reportBuilder.append("-----------------------------------------------------------------------\n");
 
-            // Loop through the volunteers and format the details into columns
             for (int i = 0; i < volunteers.size(); i++) {
                 Volunteer volunteer = volunteers.getEntry(i);
                 reportBuilder.append(String.format("%-15s %-20s %-15s %-30s\n",
@@ -502,8 +380,7 @@ public class VolunteerUI {
             }
             reportBuilder.append("-----------------------------------------------------------------------\n");
 
-            // Display the formatted volunteer list
-            MessageUI.showInfo(reportBuilder.toString());
+            MessageUI.showInfo(reportBuilder.toString()); // Display the formatted volunteer list
         }
     }
 
@@ -515,7 +392,7 @@ public class VolunteerUI {
                 addVolunteer();
             }
             MessageUI.showInfo("Returning to the main menu...");
-            return; // Exit the method
+            return; 
         }
 
         boolean continueFiltering = true;
@@ -530,7 +407,7 @@ public class VolunteerUI {
                 for (int i = 0; i < filteredVolunteers.size(); i++) {
                     Volunteer volunteer = filteredVolunteers.getEntry(i);
                     displayVolunteerDetails(volunteer);
-                    MessageUI.showInfo("---------------------------");
+                    MessageUI.showInfo("-------------------------------------");
                 }
             }
 
@@ -557,7 +434,6 @@ public class VolunteerUI {
             System.out.print(message);
             response = scanner.nextLine().trim().toLowerCase();
 
-            // Handle various input formats
             if (response.equals("yes") || response.equals("y") || response.equals("YES")) {
                 return true;
             } else if (response.equals("no") || response.equals("n") || response.equals("NO")) {
@@ -574,7 +450,6 @@ public class VolunteerUI {
     }
 
     private boolean isValidEmail(String email) {
-        // Basic email validation pattern
         String emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
         return Pattern.matches(emailPattern, email);
     }

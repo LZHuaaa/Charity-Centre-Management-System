@@ -1,4 +1,7 @@
-//author Chia Yuxuan
+/**
+ *
+ * @author Chia Yuxuan
+ */
 package utility;
 
 public class MessageUI {
@@ -18,4 +21,3 @@ public class MessageUI {
         System.out.println("WARNING: " + message);
     }
 }
-
