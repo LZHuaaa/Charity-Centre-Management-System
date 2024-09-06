@@ -89,7 +89,7 @@ public class EventDAO {
         }
 
         // Generate new ID by incrementing the highest, and format it with leading zeros
-        return String.format("E%04d", highestId + 1);
+        return String.format("E%03d", highestId + 1);
     }
 
     

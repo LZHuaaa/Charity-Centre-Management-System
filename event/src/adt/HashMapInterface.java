@@ -16,6 +16,6 @@ public interface HashMapInterface<K, V> {
     boolean remove(K key);
     V removeValue(K key);
     int size();
-
-    
+    void clear();
+    boolean containsKey(K key);
 }

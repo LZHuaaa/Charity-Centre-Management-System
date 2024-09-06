@@ -10,7 +10,7 @@ public class EventManagementUI {
 
     private EventDAO eventDAO = new EventDAO();
     private Scanner scanner = new Scanner(System.in);
-    private HashMap<String, Volunteer> volunteerMap = new HashMap<>(); // Assume you have this map to manage volunteers
+    private HashMap<String, Volunteer> volunteerMap = new HashMap<>();
 
     public int menu() {
         System.out.println("\nEvent Management System");
@@ -183,12 +183,12 @@ public class EventManagementUI {
         }
     }
 
-     public Volunteer selectVolunteer() {
+    public Volunteer selectVolunteer() {
         System.out.print("Enter Volunteer ID to select: ");
         String volunteerId = scanner.nextLine();
 
         // Fetch volunteer by ID
-        Volunteer volunteer = volunteerMap.get(volunteerId);
+        Volunteer volunteer = volunteerMap.get(volunteerId); // Ensure the correct map type
 
         if (volunteer != null) {
             return volunteer;
@@ -233,40 +233,8 @@ public class EventManagementUI {
             System.out.println("Volunteer not found.");
         }
     }
-    
 
-//    public void listEventsForVolunteer(HashMap<Volunteer, HashSet<Event>> volunteerEvents) {
-//        System.out.print("Enter Volunteer ID to list events: ");
-//        String volunteerId = scanner.nextLine();
-//
-//        Volunteer volunteer = null;
-//        for (Volunteer v : volunteerEvents.keySet()) {
-//            if (v.getId().equals(volunteerId)) {
-//                volunteer = v;
-//                break;
-//            }
-//        }
-//
-//        if (volunteer != null) {
-//            HashSet<Event> events = volunteerEvents.get(volunteer);
-//            if (events.isEmpty()) {
-//                System.out.println("No events found for this volunteer.");
-//            } else {
-//                System.out.println("Events for Volunteer ID: " + volunteerId);
-//                for (Event event : events) {
-//                    System.out.println("Event ID: " + event.getId());
-//                    System.out.println("Name: " + event.getName());
-//                    System.out.println("Date: " + event.getDate());
-//                    System.out.println("Location: " + event.getLocation());
-//                    System.out.println("Description: " + event.getDescription());
-//                    System.out.println();
-//                }
-//            }
-//        } else {
-//            System.out.println("Volunteer not found.");
-//        }
-//    }
-     public void listEventsForVolunteer(HashMap<Volunteer, HashSet<Event>> volunteerEvents) {
+    public void listEventsForVolunteer(HashMap<Volunteer, HashSet<Event>> volunteerEvents) {
         System.out.print("Enter Volunteer ID to list events: ");
         String volunteerId = scanner.nextLine();
 
@@ -284,13 +252,13 @@ public class EventManagementUI {
                 System.out.println("No events found for this volunteer.");
             } else {
                 System.out.println("Events for Volunteer ID: " + volunteerId);
-                // Convert HashSet to ArrayList for displaying
-                ArrayList<Event> eventList = new ArrayList<>();
-                  for (Event event : events) {
+                // Use your custom `adt.ArrayList` for displaying
+                adt.ArrayList<Event> eventList = new adt.ArrayList<>(); // Custom ADT
+                for (Event event : events) {
                     eventList.add(event);
                 }
                 // List events using ArrayList
-                listEvents(eventList);
+                listEvents(eventList); // Pass the custom ADT `eventList`
             }
         } else {
             System.out.println("Volunteer not found.");

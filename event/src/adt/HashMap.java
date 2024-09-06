@@ -4,6 +4,8 @@
  */
 package adt;
 
+import entity.Donee;
+
 /**
  *
  * @author leezh
@@ -62,13 +64,12 @@ public class HashMap<K, V> implements HashMapInterface<K, V> {
         return null; // Return null if the key is not found
     }
 
-    
-     public V get(int key) {
+    public V get(int key) {
         // Convert integer key to generic key type K
         K genericKey = (K) Integer.valueOf(key);
         return get(genericKey);
     }
-     
+
     @Override
     public boolean remove(K key) {
         int index = hashFunction(key);
@@ -84,7 +85,7 @@ public class HashMap<K, V> implements HashMapInterface<K, V> {
                     // Removing a node in the middle or end
                     previous.next = current.next;
                 }
-                
+
                 return true; // Node removed successfully
             }
             previous = current;
@@ -93,8 +94,6 @@ public class HashMap<K, V> implements HashMapInterface<K, V> {
 
         return false; // Key not found
     }
-    
-    
 
     public V removeValue(K key) {
         int index = hashFunction(key);
@@ -104,16 +103,16 @@ public class HashMap<K, V> implements HashMapInterface<K, V> {
         while (current != null) {
             if (current.key.equals(key)) {
                 if (previous == null) {
-                
+
                     bucketArray[index] = current.next;
                 } else {
-            
+
                     previous.next = current.next;
                 }
-                
+
                 size--;
                 return current.value;
-                
+
             }
             previous = current;
             current = current.next;
@@ -121,7 +120,7 @@ public class HashMap<K, V> implements HashMapInterface<K, V> {
 
         return null;
     }
-    
+
     @Override
     public int size() {
         int size = 0;
@@ -134,36 +133,27 @@ public class HashMap<K, V> implements HashMapInterface<K, V> {
         }
         return size;
     }
-    
-    // Additional method: clear the map
+
+    @Override
     public void clear() {
-        bucketArray = new HashMap[capacity];
-        size = 0;
+        // Set all elements in the bucket array to null, effectively clearing the map
+        for (int i = 0; i < bucketArray.length; i++) {
+            bucketArray[i] = null;
+        }
+        size = 0; // Reset the size to 0
     }
 
-    // Additional method: check if a key is present
+    @Override
     public boolean containsKey(K key) {
         int index = hashFunction(key);
         HashMap<K, V> current = bucketArray[index];
+
         while (current != null) {
             if (current.key.equals(key)) {
-                return true;
+                return true; // Key found
             }
             current = current.next;
         }
-        return false;
+        return false; // Key not found
     }
-    
-    public HashSet<K> keySet() {
-        HashSet<K> keys = new HashSet<>();
-        for (HashMap<K, V> bucket : bucketArray) {
-            HashMap<K, V> current = bucket;
-            while (current != null) {
-                keys.add(current.key);
-                current = current.next;
-            }
-        }
-        return keys;
-    }
-
 }

@@ -13,6 +13,7 @@ import adt.HashMap;
 import adt.HashSet;
 import adt.TreeMap;
 import dao.EventDAO;
+import dao.VolunteerEventDAO;
 import boundary.EventManagementUI;
 import entity.Event;
 import entity.Volunteer;
@@ -21,7 +22,10 @@ public class EventManagement {
 
     private final HashSet<Event> eventSet = new HashSet<>(); // For adding and removing events  
     private final TreeMap<String, Event> eventMap = new TreeMap<>(); // For searching and amending events  
-    private final HashMap<Volunteer, HashSet<Event>> volunteerEventMap = new HashMap<>(); // For managing events per volunteer  
+    private final HashMap<Volunteer, HashSet<Event>> volunteerEventMap = new HashMap<Volunteer, HashSet<Event>>();
+    private VolunteerEventDAO volunteerEventDAO = new VolunteerEventDAO();
+    // Assuming this is your data access object  
+    ArrayList<Event> eventList = new ArrayList<>();
 
     private final EventDAO eventDAO = new EventDAO();
     private final EventManagementUI eventManagementUI = new EventManagementUI();
@@ -36,6 +40,14 @@ public class EventManagement {
             Event event = events.getEntry(i);
             eventSet.add(event);
             eventMap.put(event.getId(), event);
+        }
+    }
+
+    private void loadVolunteerEvents() {
+        HashMap<Volunteer, HashSet<Event>> loadedVolunteerEventMap = volunteerEventDAO.retrieveVolunteerEvents();
+        for (Volunteer volunteer : loadedVolunteerEventMap.keySet()) {
+            HashSet<Event> events = loadedVolunteerEventMap.get(volunteer);
+            volunteerEventMap.put(volunteer, events);
         }
     }
 
@@ -138,6 +150,10 @@ public class EventManagement {
         if (volunteerEvents != null) {
             Event eventToRemove = eventMap.get(eventId);
             if (eventToRemove != null && volunteerEvents.remove(eventToRemove)) {
+                if (volunteerEvents.isEmpty()) {
+                    volunteerEventMap.remove(volunteer);
+                }
+                volunteerEventDAO.saveVolunteerEvents(); // Save changes to the DAO
                 System.out.println("Event removed from volunteer successfully!");
             } else {
                 System.out.println("Event not found for this volunteer.");
@@ -148,15 +164,19 @@ public class EventManagement {
     }
 
     public void listEventsForVolunteer() {
-        Volunteer volunteer = eventManagementUI.selectVolunteer(); // Assuming this method is correctly implemented
+        Volunteer volunteer = eventManagementUI.selectVolunteer();
+        if (volunteer == null) {
+            System.out.println("Invalid volunteer selection.");
+            return;
+        }
+
         HashSet<Event> volunteerEvents = volunteerEventMap.get(volunteer);
-        if (volunteerEvents != null) {
-            // Convert HashSet to ArrayList
-            ArrayList<Event> eventList = new ArrayList<>();
+        if (volunteerEvents != null && !volunteerEvents.isEmpty()) {
+            ArrayList<Event> eventList = new ArrayList<>(); // Create an empty custom ArrayList
             for (Event event : volunteerEvents) {
-                eventList.add(event);
+                eventList.add(event); // Add each event to the custom ArrayList
             }
-            eventManagementUI.listEvents(eventList); // ADT: ArrayList<Event>
+            eventManagementUI.listEvents(eventList); // Pass the ArrayList to the UI method
         } else {
             System.out.println("No events found for this volunteer.");
         }

@@ -13,16 +13,16 @@ import entity.*;
 import java.io.*;
 
 public class VolunteerEventDAO {
-    
-    private HashMap<Volunteer, HashSet<Event>> volunteerEventMap;
+
+    private HashMap<Volunteer, HashSet<Event>> volunteerEventMap = new HashMap<>();
     private static final String FILE_PATH = "volunteer_event.txt";
-    
+
     public VolunteerEventDAO() {
         volunteerEventMap = new HashMap<>();
         loadVolunteerEvents(); // Load events from file during initialization
     }
 
-   // Function 1: Load (Retrieve) Volunteer Events from the File
+    // Function 1: Load (Retrieve) Volunteer Events from the File
     public void loadVolunteerEvents() {
         volunteerEventMap.clear(); // Clear any existing data
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
@@ -33,8 +33,9 @@ public class VolunteerEventDAO {
                     String volunteerId = parts[0].trim();
                     String eventId = parts[1].trim();
 
-                    Volunteer volunteer = new Volunteer(volunteerId); // Assuming a constructor with ID
-                    Event event = new Event(eventId); // Assuming a constructor with ID
+                    // Create Volunteer and Event objects using ID
+                    Volunteer volunteer = new Volunteer(volunteerId);
+                    Event event = new Event(eventId);
 
                     // Add the volunteer and event to the HashMap
                     if (!volunteerEventMap.containsKey(volunteer)) {
@@ -68,7 +69,6 @@ public class VolunteerEventDAO {
     }
 
     // Additional helper functions (if needed):
-    
     // Check if a volunteer is already mapped to an event
     public boolean isVolunteerMappedToEvent(Volunteer volunteer, Event event) {
         return volunteerEventMap.containsKey(volunteer) && volunteerEventMap.get(volunteer).contains(event);
@@ -168,5 +168,4 @@ public class VolunteerEventDAO {
 //        return volunteerEventMap.getOrDefault(volunteer, new HashSet<>());
 //    }
 //    
-    
 }
