@@ -7,7 +7,7 @@ package boundary;
 import entity.*;
 import java.util.Scanner;
 import adt.*;
-import control.doneeMaintenance;
+import control.DoneeMaintenance;
 import dao.*;
 
 public class DoneeUI {
@@ -24,14 +24,15 @@ public class DoneeUI {
         System.out.println("5. List donee with all the donation received");
         System.out.println("6. Filter donee based on criteria");
         System.out.println("7. Generate summary report");
-        System.out.print("Enter choice (0 = Exit) : ");
+        System.out.println("0. Exit ");
+        System.out.print("Select an option: ");
         int choice = scanner.nextInt();
         scanner.nextLine();
         System.out.println();
         return choice;
     }
 
-    public Donee addDonee(ListInterface<Donee> doneeList, LinkedListInterface<Donation> availableDonations) {
+    public Donee addDonee(ListInterface<Donee> doneeList, ListInterface<Donation> availableDonations) {
         System.out.println("---Please enter the donee details---");
 
         String newId = doneeDAO.generateNewId(doneeList);
@@ -83,7 +84,7 @@ public class DoneeUI {
 
         // Ask if they want to add donations
         String addDonationResponse;
-        LinkedListInterface<Donation> selectedDonations = new LinkedList<>();
+        ListInterface<Donation> selectedDonations = new LinkedList<>();
 
         if (availableDonations.isEmpty()) {
             System.out.println("No donations can be added.");
@@ -168,35 +169,54 @@ public class DoneeUI {
 
     public void removeDonee() {
         boolean exist = false;
-
+        DoneeMaintenance dm = new DoneeMaintenance();
         Scanner scanner = new Scanner(System.in);
 
         while (!exist) {
-            System.out.print("Enter the donee ID to remove: ");
+            System.out.print("Enter the donee ID to remove (0 = exit): ");
             String doneeId = scanner.nextLine();
 
-            doneeMaintenance dm = new doneeMaintenance();
-            Donee donee = dm.remove(doneeId);
+            if ("0".equals(doneeId)) {
+                break;  
+            }
+
+            Donee donee = dm.doneeMap.get(doneeId);
 
             if (donee != null) {
-                System.out.println("\nDonee " + donee.getName() + " removed successfully!");
+ 
+                System.out.println("\nDonee Details:");
+                System.out.println("Donee ID: " + donee.getId());
+                System.out.println("Name: " + donee.getName());
+                System.out.println("Type: " + donee.getType());
+                System.out.println("Contact Number: " + donee.getContactNo());
 
-                LinkedListInterface<Donation> donations = donee.getDonations();
+     
+                System.out.print("\nDo you want to remove this donee? (y/n): ");
+                String confirmation = scanner.nextLine();
 
-                for (int i = 0; i < donations.size(); i++) {
-                    Donation donation = donations.getEntry(i);
+                if ("y".equalsIgnoreCase(confirmation)) {
+                    donee = dm.remove(doneeId);
+                    System.out.println("\nDonee " + donee.getName() + " removed successfully!");
 
+                    ListInterface<Donation> donations = donee.getDonations();
+                    for (int i = 0; i < donations.size(); i++) {
+                        Donation donation = donations.getEntry(i);
+
+                    }
+                    System.out.println("Associated donations have been returned to the donation list.");
+                    exist = true;
+                } else {
+
+                    System.out.println("Donee removal canceled.");
+                    break;
                 }
-                System.out.println("Associated donations have been returned to the donation list.");
-                exist = true;
             } else {
                 System.out.println("\nDonee not found, please try again.");
             }
         }
-
     }
 
-    public void updateDoneeDetails(HashMap<String, Donee> doneeMap, LinkedListInterface<Donation> availableDonations) {
+    public void updateDoneeDetails(HashMap<String, Donee> doneeMap, ListInterface<Donation> availableDonations) {
 
         Donee donee = new Donee();
         String doneeId;
@@ -216,7 +236,7 @@ public class DoneeUI {
             }
         } while (donee == null);
 
-        LinkedListInterface<Donation> donations = donee.getDonations();
+        ListInterface<Donation> donations = donee.getDonations();
 
         System.out.println("\n--Donee Found--");
         System.out.println("ID: " + donee.getId());
@@ -333,7 +353,7 @@ public class DoneeUI {
 
         // Ask if they want to add donations
         String addDonationResponse;
-        LinkedListInterface<Donation> selectedDonations = new LinkedList<>();
+        ListInterface<Donation> selectedDonations = new LinkedList<>();
 
         if (!availableDonations.isEmpty()) {
 
@@ -399,7 +419,7 @@ public class DoneeUI {
             }
         }
 
-        doneeMaintenance dm = new doneeMaintenance();
+        DoneeMaintenance dm = new DoneeMaintenance();
 
         boolean updated = dm.updateDonee(doneeId, newName, type, contactNo, (LinkedList<Donation>) donations);
 
@@ -411,9 +431,13 @@ public class DoneeUI {
     }
 
     public void searchDonee(HashMap<String, Donee> doneeMap) {
-        System.out.print("Enter Donee ID to search: ");
+        System.out.print("Enter Donee ID to search (0 = exit): ");
         String doneeId = scanner.nextLine();
         Donee donee = doneeMap.get(doneeId);
+
+        if ("0".equals(doneeId)) {
+            return;
+        }
 
         if (donee != null) {
             System.out.println("\n--Donee Found--");
@@ -444,7 +468,7 @@ public class DoneeUI {
 
     private void displayDonations(Donee donee) {
         //ListInterface<Donation> donations = donee.getDonations();
-        LinkedListInterface<Donation> donations = donee.getDonations();
+        ListInterface<Donation> donations = donee.getDonations();
 
         if (donations != null && !donations.isEmpty()) {
             System.out.println("\n|------------------------------------------------------------------------------------------------------|");
@@ -501,7 +525,7 @@ public class DoneeUI {
                 System.out.println("Type: " + donee.getType());
                 System.out.println("Contact Number: " + donee.getContactNo());
 
-                LinkedListInterface<Donation> donations = donee.getDonations();
+                ListInterface<Donation> donations = donee.getDonations();
                 if (donations != null && !donations.isEmpty()) {
                     System.out.println("\n|------------------------------------------------------------------------------------------------------|");
                     System.out.println("|                                           Donations                                                  |");
@@ -609,6 +633,11 @@ public class DoneeUI {
             try {
                 minAmount = scanner.nextDouble();
 
+                if (minAmount < 0) {
+                    System.out.println("Invalid input. Minimum amount cannot be negative. Please enter a positive value.");
+                    minAmount = -1;
+                }
+
             } catch (Exception e) {
                 System.out.println("Invalid input. Please enter a valid number.");
             }
@@ -629,7 +658,7 @@ public class DoneeUI {
             }
         } while (maxAmount == -1);
 
-        doneeMaintenance dm = new doneeMaintenance();
+        DoneeMaintenance dm = new DoneeMaintenance();
 
         dm.filterDoneesByDonationAmount(minAmount, maxAmount);
 
@@ -678,7 +707,7 @@ public class DoneeUI {
 
         for (int i = 0; i < doneeList.size(); i++) {
             Donee donee = doneeList.getEntry(i);
-            LinkedListInterface<Donation> donations = donee.getDonations();
+            ListInterface<Donation> donations = donee.getDonations();
 
             int donationCount = donations.size();
             double totalCash = 0.0;

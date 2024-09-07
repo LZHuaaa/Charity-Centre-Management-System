@@ -5,10 +5,35 @@
 package adt;
 
 
-public class LinkedList<T> implements LinkedListInterface<T> {
+public class LinkedList<T> implements ListInterface<T> {
 
     private Node<T> head;
     private int size;
+
+    @Override
+    public boolean isFull() {
+        throw new UnsupportedOperationException("Not supported yet."); 
+    }
+
+    @Override
+    public boolean validateIndex(int index) {
+        throw new UnsupportedOperationException("Not supported yet.");  
+    }
+
+    @Override
+    public boolean validateItem(T element) {
+        throw new UnsupportedOperationException("Not supported yet.");  
+    }
+
+    @Override
+    public void checkCapacity() {
+        throw new UnsupportedOperationException("Not supported yet.");  
+    }
+
+    @Override
+    public boolean clear() {
+        throw new UnsupportedOperationException("Not supported yet.");  
+    }
 
     // Inner Node class
     private static class Node<T> {
@@ -158,11 +183,6 @@ public class LinkedList<T> implements LinkedListInterface<T> {
         return size;
     }
 
-    @Override
-    public void clear() {
-        head = null;
-        size = 0;
-    }
 
     @Override
     public boolean contains(T anEntry) {
