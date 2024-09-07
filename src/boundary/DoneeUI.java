@@ -7,7 +7,7 @@ package boundary;
 import entity.*;
 import java.util.Scanner;
 import adt.*;
-import control.DoneeMaintenance;
+import control. doneeMaintenance;
 import dao.*;
 
 public class DoneeUI {
@@ -169,7 +169,7 @@ public class DoneeUI {
 
     public void removeDonee() {
         boolean exist = false;
-        DoneeMaintenance dm = new DoneeMaintenance();
+         doneeMaintenance dm = new  doneeMaintenance();
         Scanner scanner = new Scanner(System.in);
 
         while (!exist) {
@@ -419,7 +419,7 @@ public class DoneeUI {
             }
         }
 
-        DoneeMaintenance dm = new DoneeMaintenance();
+         doneeMaintenance dm = new  doneeMaintenance();
 
         boolean updated = dm.updateDonee(doneeId, newName, type, contactNo, (LinkedList<Donation>) donations);
 
@@ -658,7 +658,7 @@ public class DoneeUI {
             }
         } while (maxAmount == -1);
 
-        DoneeMaintenance dm = new DoneeMaintenance();
+         doneeMaintenance dm = new  doneeMaintenance();
 
         dm.filterDoneesByDonationAmount(minAmount, maxAmount);
 

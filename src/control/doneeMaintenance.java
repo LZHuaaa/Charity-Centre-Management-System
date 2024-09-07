@@ -12,7 +12,7 @@ import utility.*;
 public class doneeMaintenance {
 
     private ListInterface<Donee> doneeList = new ArrayList<>();
-    private LinkedListInterface<Donation> donationList = new LinkedList<>();
+    private ListInterface<Donation> donationList = new LinkedList<>();
     public HashMap<String, Donee> doneeMap = new HashMap<>();
     private DoneeDAO doneeDAO = new DoneeDAO();
     private DoneeUI doneeUI = new DoneeUI();
@@ -82,7 +82,7 @@ public class doneeMaintenance {
 
             doneeList.remove(donee);
 
-            LinkedListInterface<Donation> doneeDonations = donee.getDonations();
+            ListInterface<Donation> doneeDonations = donee.getDonations();
 
             for (int i = 0; i < doneeDonations.size(); i++) {
                 Donation donation = doneeDonations.getEntry(i);
@@ -307,7 +307,7 @@ public class doneeMaintenance {
             Donee donee = doneeList.getEntry(i);
             double totalDonationAmount = 0.0;
 
-            LinkedListInterface<Donation> donations = donee.getDonations();
+            ListInterface<Donation> donations = donee.getDonations();
             for (int j = 0; j < donations.size(); j++) {
                 Donation donation = donations.getEntry(j);
                 totalDonationAmount += donation.getCashAmount();

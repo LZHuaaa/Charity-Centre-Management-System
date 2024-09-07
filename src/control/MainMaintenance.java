@@ -27,7 +27,7 @@ public class MainMaintenance {
                     new DonorUI().run();
                     break;
                 case 2:
-                    new DoneeMaintenance().runDoneeMaintenance();
+                    new doneeMaintenance().runDoneeMaintenance();
                     break;
                 case 3:
                     new VolunteerUI().start();
