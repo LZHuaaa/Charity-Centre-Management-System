@@ -1,4 +1,5 @@
-DE001,Abu,Organisation,013-4567890,D003
-DE002,Ah Gao,Organisation,012-3456789,D001
+DE001,Abu,Organisation,012-3456789,D001;D006
+DE002,Ah Gao,Organisation,012-3456789,D003
 DE003,Ali,Individual,012-3456789,D004
 DE004,Mei Mei,Family,012-3456789,D005
+DE005,lee,Organisation,012-3456789,

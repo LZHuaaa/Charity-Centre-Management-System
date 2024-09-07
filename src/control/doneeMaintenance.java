@@ -22,12 +22,14 @@ public class doneeMaintenance {
     }
 
     private void loadAllFromFile() {
+        DonorDAO.processAndSaveDonations("donor.txt","donation.txt");
         doneeList = doneeDAO.retrieveDonees();
         donationList = doneeDAO.retrieveDonations(doneeList);
         doneeMap = doneeDAO.loadDoneesIntoMap();
     }
 
     public void runDoneeMaintenance() {
+    
         int choice = 0;
         do {
             choice = doneeUI.menu();

@@ -1,0 +1,10 @@
+D001,handsome,100.0
+    Milo,3
+D006,love,70.0
+    -,0
+D003,-,15000.0
+    Food,34
+D004,Nice,200.0
+    Snacks,30
+D005,helpful,300.0
+    Candy,10
