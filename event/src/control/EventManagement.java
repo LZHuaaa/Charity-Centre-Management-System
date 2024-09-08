@@ -49,68 +49,6 @@ public class EventManagement {
         volunteerEventMap = volunteerEventDAO.loadIntoHashMap();
         volunteerSet = volunteerEventDAO.loadIntoHashSet();
         volunteerMap = volunteerDAO.loadIntoHashMap();
-
-        System.out.println("Retrieved Events from DAO:");
-        if (eventList.isEmpty()) {
-            System.out.println("No events found in the retrieved ArrayList.");
-        } else {
-            for (Event event : eventList) {
-                System.out.println("Event ID: " + event.getId() + ", Name: " + event.getName());
-            }
-        }
-
-        for (Event event : eventList) { // Iterate through each event  
-            eventSet.add(event); // Add to the HashSet  
-            eventMap.put(event.getId(), event); // Add to the HashMap for quick access  
-        }
-
-        // Display loaded events  
-        System.out.println("Loaded Events:");
-        for (Event event : eventList) {
-            System.out.println("Event ID: " + event.getId() + ", Name: " + event.getName());
-        }
-
-        // Display Event IDs in HashMap  
-        System.out.print("Event IDs in HashMap: ");
-        if (eventMap == null) {
-            System.out.println("No events found in HashMap.");
-        } else {
-            for (String eventId : eventMap.keySet()) {
-                System.out.print(eventId + " ");
-            }
-            System.out.println(); // for a newline after printing all event IDs  
-        }
-
-        System.out.print("Volunteer IDs in HashMap: ");
-        if (volunteerMap == null) {
-            System.out.println("No Volunteer found in HashMap.");
-        } else {
-            for (String volunteerID : volunteerMap.keySet()) {
-                System.out.print(volunteerID + " ");
-            }
-            System.out.println(); // for a newline after printing all event IDs  
-        }
-
-        System.out.print("VolunteerEvent IDs in HashMap: ");
-        if (volunteerEventMap == null) {
-            System.out.println("No VolunteerEvent found in HashMap.");
-        } else {
-            for (String eventId : volunteerEventMap.keySet()) {
-                System.out.print(eventId + " ");
-            }
-            System.out.println(); // for a newline after printing all event IDs  
-        }
-
-        // Display contents of the HashSet  
-        System.out.print("Event IDs in HashSet: ");
-        if (eventSet.isEmpty()) {
-            System.out.println("No events found in HashSet.");
-        } else {
-            for (Event event : eventSet) {
-                System.out.print(event.getName() + ", ");
-            }
-            System.out.println(); // for a newline after printing all event IDs  
-        }
     }
 
     private void loadVolunteerEvents() {
