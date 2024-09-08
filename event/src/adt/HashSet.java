@@ -8,60 +8,77 @@ package adt;
  *
  * @author eyong
  */
+import java.util.Iterator;
 
-import java.util.Iterator;  
+public class HashSet<T> implements SetInterface<T>, Iterable<T> {
 
-public class HashSet<T> implements HashSetInterface<T>, Iterable<T> { // Implement Iterable
-    private Object[] table;
-    private int size;
     private static final int INITIAL_CAPACITY = 16;
+    private LinkedList<T>[] table;
+    private int size;
 
+    @SuppressWarnings("unchecked")
     public HashSet() {
-        table = new Object[INITIAL_CAPACITY];
+        table = (LinkedList<T>[]) new LinkedList[INITIAL_CAPACITY];
         size = 0;
     }
 
     @Override
     public boolean add(T element) {
         if (element == null) {
-            throw new IllegalArgumentException("Element cannot be null.");
+            throw new NullPointerException("Element cannot be null");
         }
-        if (contains(element)) {
-            return false; // Element already exists
-        }
-        ensureCapacity();
+
         int index = getIndex(element);
-        table[index] = element;
-        size++;
-        return true;
+        if (table[index] == null) {
+            table[index] = new LinkedList<>();
+        }
+
+        if (!table[index].contains(element)) {
+            table[index].add(element);
+            size++;
+            return true;
+        }
+        return false;
     }
 
     @Override
     public boolean remove(T element) {
         if (element == null) {
-            throw new IllegalArgumentException("Element cannot be null.");
+            throw new NullPointerException("Element cannot be null");
         }
+
         int index = getIndex(element);
-        if (table[index] != null && table[index].equals(element)) {
-            table[index] = null; // Remove the element
-            size--;
-            return true;
+        if (table[index] != null) {
+            // Find the index of the element in the linked list  
+            int elementIndex = table[index].indexOf(element);
+            if (elementIndex != -1) {
+                // Remove the element by index  
+                table[index].remove(elementIndex);
+                size--;
+                // Check if the linked list is empty and set it to null if so  
+                if (table[index].isEmpty()) {
+                    table[index] = null;
+                }
+                return true; // Element was removed  
+            }
         }
-        return false; // Element not found
+        return false; // Element not found  
     }
 
     @Override
     public boolean contains(T element) {
         if (element == null) {
-            throw new IllegalArgumentException("Element cannot be null.");
+            throw new NullPointerException("Element cannot be null");
         }
+
         int index = getIndex(element);
-        return table[index] != null && table[index].equals(element);
+        return table[index] != null && table[index].contains(element);
     }
 
     @Override
-    public boolean isEmpty() {
-        return size == 0;
+    public void clear() {
+        table = (LinkedList<T>[]) new LinkedList[INITIAL_CAPACITY];
+        size = 0;
     }
 
     @Override
@@ -70,56 +87,71 @@ public class HashSet<T> implements HashSetInterface<T>, Iterable<T> { // Impleme
     }
 
     @Override
-    public void clear() {
-        for (int i = 0; i < table.length; i++) {
-            table[i] = null; // Clear each element
-        }
-        size = 0;
+    public boolean isEmpty() {
+        return size == 0;
     }
 
     private int getIndex(T element) {
         return Math.abs(element.hashCode()) % table.length;
     }
+    
+    public boolean removeIf(java.util.function.Predicate<? super T> filter) {  
+    boolean removed = false;  
+    for (int i = 0; i < table.length; i++) {  
+        if (table[i] != null) {  
+            Iterator<T> iterator = table[i].iterator();  
+            while (iterator.hasNext()) {  
+                T element = iterator.next();  
+                if (filter.test(element)) {  
+                    iterator.remove(); // Remove element using the iterator  
+                    removed = true;  
+                }  
+            }  
+            // If the bucket becomes empty after removals, set it to null  
+            if (table[i].isEmpty()) {  
+                table[i] = null;  
+            }  
+        }  
+    }  
+    return removed;  
+}  
 
-    private void ensureCapacity() {
-        if (size >= table.length * 0.75) {
-            int newCapacity = table.length * 2;
-            Object[] newTable = new Object[newCapacity];
-            for (int i = 0; i < table.length; i++) {
-                if (table[i] != null) {
-                    int newIndex = Math.abs(table[i].hashCode()) % newCapacity;
-                    newTable[newIndex] = table[i];
-                }
-            }
-            table = newTable;
-        }
-    }
-
+    // Implementing the Iterable interface  
     @Override
     public Iterator<T> iterator() {
-        return new HashSetIterator(); // Return iterator
-    }
+        return new Iterator<T>() {
+            private int currentBucket = 0;
+            private Iterator<T> currentIterator = getNextIterator();
 
-    // Inner class to implement Iterator
-    private class HashSetIterator implements Iterator<T> {
-        private int currentIndex = 0;
-        private int elementsReturned = 0;
-
-        @Override
-        public boolean hasNext() {
-            return elementsReturned < size; // Check if there are more elements
-        }
-
-        @Override
-        public T next() {
-            while (currentIndex < table.length) {
-                if (table[currentIndex] != null) {
-                    elementsReturned++;
-                    return (T) table[currentIndex++]; // Return the current element and move to the next
+            private Iterator<T> getNextIterator() {
+                while (currentBucket < table.length) {
+                    if (table[currentBucket] != null) {
+                        return table[currentBucket].iterator();
+                    }
+                    currentBucket++;
                 }
-                currentIndex++;
+                return null; // No more elements  
             }
-            throw new java.util.NoSuchElementException("No more elements in the HashSet.");
-        }
+
+            @Override
+            public boolean hasNext() {
+                if (currentIterator == null) {
+                    return false;
+                }
+                while (!currentIterator.hasNext()) {
+                    currentBucket++;
+                    currentIterator = getNextIterator();
+                    if (currentIterator == null) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public T next() {
+                return currentIterator.next();
+            }
+        };
     }
 }

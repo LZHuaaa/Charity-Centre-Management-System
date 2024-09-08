@@ -3,12 +3,12 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package adt;
-
+import java.util.Iterator;
 /**
  *
  * @author leezh
  */
-public class LinkedList<T> implements LinkedListInterface<T> {
+public class LinkedList<T> implements LinkedListInterface<T> , Iterable<T> { 
 
     private Node<T> head;
     private int size;
@@ -88,6 +88,7 @@ public class LinkedList<T> implements LinkedListInterface<T> {
         size--;
         return current.data;
     }
+    
 
     @Override
     public T getEntry(int index) {
@@ -194,4 +195,25 @@ public class LinkedList<T> implements LinkedListInterface<T> {
 
         head = previous;
     }
+    @Override  
+    public Iterator<T> iterator() {  
+        return new Iterator<T>() {  
+            private Node<T> current = head;  
+
+            @Override  
+            public boolean hasNext() {  
+                return current != null;  
+            }  
+
+            @Override  
+            public T next() {  
+                if (!hasNext()) {  
+                    throw new IllegalStateException("No more elements");  
+                }  
+                T data = current.data;  
+                current = current.next;  
+                return data;  
+            }  
+        };  
+    }  
 }

@@ -1,9 +1,5 @@
-E006,sadjasdasd,3000-10-10,sadasd,asdasd
-E007,asdasdasd,2020-12-12,assd,aaa
-E008,asdsad,2000-12-12,saasdasd,asdasda
-E009,asdasd,1999-12-19,sdcsd,adssd
-E001,testEvent 1,2020-10-19,Johor,hahahha
-E002,asudasduh,2000-12-12,asdjasdnjsd,oiasdasdjasdjasjd
-E003,asdasad,2000-12-12,asdasdsa,asdasdad
-E004,asd,2000-10-12,sdfsdf,sdfdsfdsf
-E005,sad,2000-12-12,sadas,sadasdasd
+E001, Malaysia Day Charity Run, 2023-09-16, Kuala Lumpur, A charity run to celebrate Malaysia Day and raise funds for local NGOs  
+E002, Food Bank Drive, 2023-11-25, Penang, Collecting food items for the less fortunate during the festive season  
+E003, Eco-Friendly Workshop, 2023-12-10, Johor Bahru, A workshop to educate the community on sustainable living practices  
+E004, Charity Concert, 2024-01-15, Kota Kinabalu, A concert featuring local artists to raise funds for children's education  
+E005, Blood Donation Campaign, 2024-02-20, Selangor, A campaign to encourage blood donation and save lives  

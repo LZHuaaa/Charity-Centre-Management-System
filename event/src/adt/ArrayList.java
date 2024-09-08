@@ -4,11 +4,13 @@
  */
 package adt;
 
+import java.util.Iterator;
+
 /**
  *
  * @author leezh
  */
-public class ArrayList<T> implements ListInterface<T> {
+public class ArrayList<T> implements ListInterface<T>, Iterable<T> {
 
     private T[] array;
     private int size = 0;
@@ -200,5 +202,27 @@ public class ArrayList<T> implements ListInterface<T> {
         return true;
     }
 
-   
+    @Override
+    public Iterator<T> iterator() {
+        return new ArrayListIterator();
+    }
+
+    private class ArrayListIterator implements Iterator<T> {
+
+        private int currentIndex = 0;
+
+        @Override
+        public boolean hasNext() {
+            return currentIndex < size;
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new java.util.NoSuchElementException();
+            }
+            return array[currentIndex++];
+        }
+    }
+
 }

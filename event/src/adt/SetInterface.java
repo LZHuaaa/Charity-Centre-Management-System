@@ -8,11 +8,11 @@ package adt;
  *
  * @author eyong
  */
-public interface HashSetInterface<T> {  
-    boolean add(T element);  
-    boolean remove(T element);  
-    boolean contains(T element);  
-    boolean isEmpty();  
-    int size();  
-    void clear();  
-}  
+public interface SetInterface<T> {
+    boolean add(T element);
+    boolean remove(T element);
+    boolean contains(T element);
+    void clear();
+    int size();
+    boolean isEmpty();
+}

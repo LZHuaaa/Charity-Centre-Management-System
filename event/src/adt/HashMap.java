@@ -10,7 +10,7 @@ import entity.Donee;
  *
  * @author leezh
  */
-public class HashMap<K, V> implements HashMapInterface<K, V> {
+public class HashMap<K, V> implements MapInterface<K, V> {
 
     private K key;
     private V value;
@@ -135,25 +135,67 @@ public class HashMap<K, V> implements HashMapInterface<K, V> {
     }
 
     @Override
-    public void clear() {
-        // Set all elements in the bucket array to null, effectively clearing the map
-        for (int i = 0; i < bucketArray.length; i++) {
-            bucketArray[i] = null;
+    public ArrayList<V> values() {
+        ArrayList<V> valuesList = new ArrayList<>();
+        for (HashMap<K, V> bucket : bucketArray) {
+            HashMap<K, V> current = bucket;
+            while (current != null) {
+                valuesList.add(current.value);
+                current = current.next;
+            }
         }
-        size = 0; // Reset the size to 0
+        return valuesList;
     }
 
     @Override
     public boolean containsKey(K key) {
         int index = hashFunction(key);
         HashMap<K, V> current = bucketArray[index];
-
         while (current != null) {
             if (current.key.equals(key)) {
-                return true; // Key found
+                return true;
             }
             current = current.next;
         }
-        return false; // Key not found
+        return false;
     }
+
+    @Override
+    public boolean containsValue(V value) {
+        for (HashMap<K, V> bucket : bucketArray) {
+            HashMap<K, V> current = bucket;
+            while (current != null) {
+                if (current.value.equals(value)) {
+                    return true;
+                }
+                current = current.next;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void clear() {
+        bucketArray = new HashMap[capacity];
+        size = 0;
+    }
+
+    @Override
+    public Set<K> keySet() {
+        Set<K> keySet = new Set<>(); // Use your custom Set implementation  
+        for (HashMap<K, V> bucket : bucketArray) {
+            HashMap<K, V> current = bucket;
+            while (current != null) {
+                keySet.add(current.key); // Add keys to your custom Set  
+                current = current.next;
+            }
+        }
+        return keySet;
+    }
+    
+    public V getOrDefault(K key, V defaultValue) {  
+        V value = get(key); // Use the existing get method  
+        return (value != null) ? value : defaultValue; // Return the value or the default  
+    }  
+
 }

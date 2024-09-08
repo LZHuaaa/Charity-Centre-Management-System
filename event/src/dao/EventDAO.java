@@ -1,6 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/*  
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license  
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template  
  */
 package dao;
 
@@ -14,83 +14,100 @@ import java.io.*;
 
 public class EventDAO {
 
-    private String fileName = "event.txt"; // File to store events  
+    private ArrayList<Event> eventList = new ArrayList<>();
+    private HashSet<Event> events = new HashSet<>(); // Ensure this is declared as a class field  
+    private HashMap<String, Event> eventMap = new HashMap<>(); // HashMap to map event IDs to events  
+    private final String filePath; // Path to the events file  
 
     public EventDAO() {
+        this.filePath = "Event.txt"; // Default file path  
+        this.events = new HashSet<>(); // Initialize the HashSet  
+        this.eventMap = new HashMap<>(); // Initialize the HashMap  
+        loadIntoHashSet(); // Load events from the default file  
     }
 
-    public EventDAO(String fileName) {
-        this.fileName = fileName;
+    // Constructor  
+    public EventDAO(String filePath) {
+        this.filePath = filePath; // Initialize the filePath with the provided one  
+        this.events = new HashSet<>(); // Initialize the HashSet  
+        this.eventMap = new HashMap<>(); // Initialize the HashMap  
     }
 
-    // Save events to a file  
-    public boolean saveEvents(HashSet<Event> eventSet) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-            for (Event event : eventSet) {
-                writer.write(event.getId() + "," + event.getName() + "," + event.getDate() + "," + event.getLocation() + "," + event.getDescription());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.out.println("Error writing events to file: " + e.getMessage());
-            return false;
-        }
-        return true;
-    }
-
-    // Retrieve events from a file (returns a ListInterface of events)  
-    public ArrayList<Event> retrieveEvents() {
-        ArrayList<Event> eventList = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
+    // Load events into a HashSet from the predefined file  
+    public HashSet<Event> loadIntoHashSet() {
+        events.clear(); // Clear existing events  
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-            while ((line = reader.readLine()) != null) {
-                String[] eventData = line.split(",");
-                if (eventData.length >= 5) {
+            while ((line = br.readLine()) != null) {
+                String[] eventData = line.split(", ");
+                if (eventData.length == 5) { // Ensure proper data length  
                     Event event = new Event(eventData[0], eventData[1], eventData[2], eventData[3], eventData[4]);
-                    eventList.add(event);
+                    events.add(event); // Add event to HashSet  
+                    // Debugging output for each event added  
+                    System.out.println("Loaded Event: " + event.getId() + " - " + event.getName());
+                } else {
+                    System.out.println("Invalid data length for line: " + line);
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error reading events from file: " + e.getMessage());
+            e.printStackTrace(); // Handle any IO exceptions  
         }
-        return eventList;
+        System.out.println("Total events loaded: " + events.size()); // Print total loaded events  
+        return events; // Return loaded events  
     }
 
-    // Load events into a TreeMap for quick access via ID  
-    public TreeMap<String, Event> loadEventsIntoMap() {
-        TreeMap<String, Event> eventMap = new TreeMap<>();
-        ArrayList<Event> events = retrieveEvents();
-
-        for (int i = 0; i < events.size(); i++) {
-            Event event = events.getEntry(i);
-            eventMap.put(event.getId(), event);
-        }
-
-        return eventMap;
-    }
-
-    // Generate a new ID for events  
-    public String generateNewId(HashSet<Event> eventSet) {
-        int highestId = 0;
-
-        // Using the iterator to loop through the HashSet  
-        for (Event event : eventSet) {
-            try {
-                // Extract the numeric part of the ID and parse it
-                String id = event.getId();
-                if (id.startsWith("E")) {
-                    int currentId = Integer.parseInt(id.substring(1)); // Remove the "E" and parse the number
-                    if (currentId > highestId) {
-                        highestId = currentId;
-                    }
+    // Load events into a HashMap from the predefined file  
+    public HashMap<String, Event> loadIntoHashMap() {
+        eventMap.clear(); // Clear existing events in the map  
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] eventData = line.split(", ");
+                if (eventData.length == 5) { // Ensure proper data length  
+                    Event event = new Event(eventData[0], eventData[1], eventData[2], eventData[3], eventData[4]);
+                    eventMap.put(event.getId(), event); // Map event ID to the event  
                 }
-            } catch (NumberFormatException e) {
-                System.out.println("Invalid event ID format: " + event.getId());
             }
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle any IO exceptions  
         }
-
-        // Generate new ID by incrementing the highest, and format it with leading zeros
-        return String.format("E%03d", highestId + 1);
+        return eventMap; // Return the populated map  
     }
 
-    
+    // Save events from HashSet to the predefined file  
+    public void save(HashSet<Event> eventsToSave) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+            for (Event event : eventsToSave) { // Iterate through each event in the provided HashSet  
+                String line = String.join(", ", event.getId(), event.getName(), event.getDate(), event.getLocation(), event.getDescription());
+                bw.write(line); // Write the event line to the file  
+                bw.newLine(); // Add a new line  
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle any IO exceptions  
+        }
+    }
+
+    // Retrieve events into an ArrayList  
+    public ArrayList<Event> loadIntoArrayList() {
+        ArrayList<Event> eventList = new ArrayList<>(); // Create an instance of ArrayList  
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] eventData = line.split(", ");
+                if (eventData.length == 5) { // Ensure proper data length  
+                    Event event = new Event(eventData[0], eventData[1], eventData[2], eventData[3], eventData[4]);
+                    eventList.add(event); // Add event to the ArrayList  
+                    // Debugging output for each event added  
+                    System.out.println("Loaded Event into ArrayList: " + event.getId() + " - " + event.getName());
+                } else {
+                    System.out.println("Invalid data length for line: " + line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle any IO exceptions  
+        }
+        System.out.println("Total events loaded into ArrayList: " + eventList.size()); // Print total loaded events  
+        return eventList; // Return the populated ArrayList  
+    }
+
 }

@@ -1,6 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+/*  
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license  
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template  
  */
 package dao;
 
@@ -14,158 +14,124 @@ import java.io.*;
 
 public class VolunteerEventDAO {
 
-    private HashMap<Volunteer, HashSet<Event>> volunteerEventMap = new HashMap<>();
-    private static final String FILE_PATH = "volunteer_event.txt";
+    private HashSet<VolunteerEvent> volunteerEvents = new HashSet<>(); // HashSet to store volunteer-event relationships  
+    private HashMap<String, VolunteerEvent> volunteerEventMap = new HashMap<>(); // Map to find events by volunteer ID  
+    private final String filePath; // Path to the volunteer-event file  
 
     public VolunteerEventDAO() {
-        volunteerEventMap = new HashMap<>();
-        loadVolunteerEvents(); // Load events from file during initialization
+        this.filePath = "volunteer_event.txt"; // Default file path  
+        loadIntoHashSet(); // Load volunteer-event relationships from the default file  
     }
 
-    // Function 1: Load (Retrieve) Volunteer Events from the File
-    public void loadVolunteerEvents() {
-        volunteerEventMap.clear(); // Clear any existing data
-        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_PATH))) {
+    // Constructor with filepath  
+    public VolunteerEventDAO(String filePath) {
+        this.filePath = filePath; // Initialize the filePath with the provided one  
+    }
+
+    // Load volunteer-event pairs into a HashSet from the predefined file  
+    public HashSet<VolunteerEvent> loadIntoHashSet() {
+        volunteerEvents.clear(); // Clear existing relationships  
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(", ");
-                if (parts.length == 2) {
-                    String volunteerId = parts[0].trim();
-                    String eventId = parts[1].trim();
+            while ((line = br.readLine()) != null) {
+                String[] eventData = line.split(", ");
+                if (eventData.length == 2) { // Ensure proper data length  
+                    String volunteerId = eventData[0];
+                    String eventId = eventData[1];
+                    Volunteer volunteer = new Volunteer(volunteerId, "", "", ""); // Create a Volunteer object (name, phone, email can be empty)  
+                    Event event = new Event(eventId, "", "", "", ""); // Create an Event object (name, date, location, description can be empty)  
+                    VolunteerEvent volunteerEvent = new VolunteerEvent(volunteer);
+                    volunteerEvent.addEvent(event); // Associate the event with the volunteer  
+                    volunteerEvents.add(volunteerEvent); // Add relationship to HashSet  
+                    System.out.println("Loaded Volunteer-Event: " + volunteerId + " - " + eventId);
+                } else {
+                    System.out.println("Invalid data length for line: " + line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle any IO exceptions  
+        }
+        System.out.println("Total volunteer-events loaded: " + volunteerEvents.size()); // Print total loaded Volunteer-Events  
+        return volunteerEvents; // Return loaded Volunteer-Events  
+    }
 
-                    // Create Volunteer and Event objects using ID
-                    Volunteer volunteer = new Volunteer(volunteerId);
-                    Event event = new Event(eventId);
+    // Load volunteer-event pairs into a HashMap for quick access  
+    public HashMap<String, VolunteerEvent> loadIntoHashMap() {
+        volunteerEventMap.clear(); // Clear existing relationships in the map  
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] eventData = line.split(", ");
+                if (eventData.length == 2) { // Ensure proper data length  
+                    String volunteerId = eventData[0];
+                    String eventId = eventData[1];
 
-                    // Add the volunteer and event to the HashMap
-                    if (!volunteerEventMap.containsKey(volunteer)) {
-                        volunteerEventMap.put(volunteer, new HashSet<>());
+                    Volunteer volunteer = new Volunteer(volunteerId, "", "", ""); // Create a Volunteer object  
+                    Event event = new Event(eventId, "", "", "", ""); // Create an Event object  
+                    VolunteerEvent volunteerEvent = new VolunteerEvent(volunteer);
+                    volunteerEvent.addEvent(event); // Associate the event with the volunteer  
+
+                    // Check if the volunteer already exists in the map  
+                    if (volunteerEventMap.containsKey(volunteerId)) {
+                        volunteerEventMap.get(volunteerId).addEvent(event); // Add event to existing VolunteerEvent  
+                    } else {
+                        volunteerEventMap.put(volunteerId, volunteerEvent); // Map volunteer ID to VolunteerEvent  
                     }
-                    volunteerEventMap.get(volunteer).add(event);
+                } else {
+                    System.out.println("Invalid data length for line: " + line); // Debug print for invalid lines  
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error loading volunteer events: " + e.getMessage());
+            e.printStackTrace(); // Handle any IO exceptions  
         }
+        return volunteerEventMap; // Return the populated map  
     }
 
-    // Function 2: Retrieve the Map (for use elsewhere in the system)
-    public HashMap<Volunteer, HashSet<Event>> retrieveVolunteerEvents() {
-        return volunteerEventMap;
-    }
+    // Save all volunteer-event pairs from HashSet to the predefined file  
+    public void save(HashMap<Volunteer, HashSet<Event>> volunteerEventsToSave) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
+            // Get the set of keys (volunteers)  
+            Set<Volunteer> volunteers = volunteerEventsToSave.keySet();
 
-    // Function 3: Save Volunteer Events to the File
-    public void saveVolunteerEvents() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_PATH))) {
-            for (Volunteer volunteer : volunteerEventMap.keySet()) {
-                for (Event event : volunteerEventMap.get(volunteer)) {
-                    writer.write(volunteer.getId() + ", " + event.getId());
-                    writer.newLine();
+            for (Volunteer volunteer : volunteers) {
+                HashSet<Event> events = volunteerEventsToSave.get(volunteer); // Retrieve the events for the volunteer  
+                if (events != null) {
+                    for (Event event : events) { // Iterate through events associated with the volunteer  
+                        String line = String.join(", ", volunteer.getId(), event.getId());
+                        bw.write(line); // Write the volunteer-event line to the file  
+                        bw.newLine(); // Add a new line  
+                    }
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error saving volunteer events: " + e.getMessage());
+            e.printStackTrace(); // Handle any IO exceptions  
         }
     }
 
-    // Additional helper functions (if needed):
-    // Check if a volunteer is already mapped to an event
-    public boolean isVolunteerMappedToEvent(Volunteer volunteer, Event event) {
-        return volunteerEventMap.containsKey(volunteer) && volunteerEventMap.get(volunteer).contains(event);
-    }
-
-    // Remove a specific event for a volunteer
-    public boolean removeEventFromVolunteer(Volunteer volunteer, Event event) {
-        if (volunteerEventMap.containsKey(volunteer)) {
-            HashSet<Event> events = volunteerEventMap.get(volunteer);
-            return events.remove(event);
+    // Retrieve volunteer-event pairs into an ArrayList  
+    public ArrayList<VolunteerEvent> loadIntoArrayList() {
+        ArrayList<VolunteerEvent> volunteerEventList = new ArrayList<>(); // Create an instance of ArrayList  
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] eventData = line.split(", ");
+                if (eventData.length == 2) { // Ensure proper data length  
+                    String volunteerId = eventData[0];
+                    String eventId = eventData[1];
+                    Volunteer volunteer = new Volunteer(volunteerId, "", "", ""); // Create a Volunteer object  
+                    Event event = new Event(eventId, "", "", "", ""); // Create an Event object  
+                    VolunteerEvent volunteerEvent = new VolunteerEvent(volunteer);
+                    volunteerEvent.addEvent(event); // Associate the event with the volunteer  
+                    volunteerEventList.add(volunteerEvent); // Add relationship to the ArrayList  
+                    System.out.println("Loaded Volunteer-Event into ArrayList: " + volunteerId + " - " + eventId);
+                } else {
+                    System.out.println("Invalid data length for line: " + line);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle any IO exceptions  
         }
-        return false;
+        System.out.println("Total volunteer-events loaded into ArrayList: " + volunteerEventList.size()); // Print total loaded volunteer-events  
+        return volunteerEventList; // Return the populated ArrayList  
     }
-
-//    // Save volunteer-event mappings to a file
-//    public boolean saveVolunteerEvents() {
-//        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
-//            for (Map.Entry<Volunteer, HashSet<Event>> entry : volunteerEventMap.entrySet()) {
-//                Volunteer volunteer = entry.getKey();
-//                HashSet<Event> events = entry.getValue();
-//                for (Event event : events) {
-//                    writer.write(volunteer.getId() + "," + event.getId());
-//                    writer.newLine();
-//                }
-//            }
-//        } catch (IOException e) {
-//            System.out.println("Error writing volunteer events to file: " + e.getMessage());
-//            return false;
-//        }
-//        return true;
-//    }
-//
-//    // Retrieve volunteer-event mappings from a file
-//    public void retrieveVolunteerEvents() {
-//        try (BufferedReader reader = new BufferedReader(new FileReader(fileName))) {
-//            String line;
-//            while ((line = reader.readLine()) != null) {
-//                String[] parts = line.split(",");
-//                if (parts.length == 2) {
-//                    String volunteerId = parts[0];
-//                    String eventId = parts[1];
-//                    
-//                    // Assuming that getVolunteerById and getEventById methods are available
-//                    Volunteer volunteer = getVolunteerById(volunteerId);
-//                    Event event = getEventById(eventId);
-//                    
-//                    if (volunteer != null && event != null) {
-//                        HashSet<Event> events = volunteerEventMap.get(volunteer);
-//                        if (events == null) {
-//                            events = new HashSet<>();
-//                            volunteerEventMap.put(volunteer, events);
-//                        }
-//                        events.add(event);
-//                    }
-//                }
-//            }
-//        } catch (IOException e) {
-//            System.out.println("Error reading volunteer events from file: " + e.getMessage());
-//        }
-//    }
-//
-//    // Helper method to get Volunteer by ID
-//    private Volunteer getVolunteerById(String id) {
-//        // Implement logic to retrieve Volunteer object by ID
-//        return null;
-//    }
-//
-//    // Helper method to get Event by ID
-//    private Event getEventById(String id) {
-//        // Implement logic to retrieve Event object by ID
-//        return null;
-//    }
-//    
-//    // Add a volunteer-event mapping
-//    public void addVolunteerEvent(Volunteer volunteer, Event event) {
-//        HashSet<Event> events = volunteerEventMap.get(volunteer);
-//        if (events == null) {
-//            events = new HashSet<>();
-//            volunteerEventMap.put(volunteer, events);
-//        }
-//        events.add(event);
-//    }
-//
-//    // Remove a volunteer-event mapping
-//    public void removeVolunteerEvent(Volunteer volunteer, Event event) {
-//        HashSet<Event> events = volunteerEventMap.get(volunteer);
-//        if (events != null) {
-//            events.remove(event);
-//            if (events.isEmpty()) {
-//                volunteerEventMap.remove(volunteer);
-//            }
-//        }
-//    }
-//
-//    // List all events for a volunteer
-//    public HashSet<Event> listEventsForVolunteer(Volunteer volunteer) {
-//        return volunteerEventMap.getOrDefault(volunteer, new HashSet<>());
-//    }
-//    
 }

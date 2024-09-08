@@ -2,7 +2,6 @@ package boundary;
 
 import entity.*;
 import adt.*;
-import control.EventManagement;
 import dao.*;
 import java.util.Scanner;
 
@@ -10,7 +9,7 @@ public class EventManagementUI {
 
     private EventDAO eventDAO = new EventDAO();
     private Scanner scanner = new Scanner(System.in);
-    private HashMap<String, Volunteer> volunteerMap = new HashMap<>();
+//    private final HashMap<String, Volunteer> volunteerMap = new HashMap<>();
 
     public int menu() {
         System.out.println("\nEvent Management System");
@@ -29,11 +28,10 @@ public class EventManagementUI {
         return choice;
     }
 
-    public Event addEvent(HashSet<Event> eventSet) {
+    public Event addEvent(HashSet<Event> eventSet, String eventId) {
         System.out.println("--- Please enter the event details ---");
 
-        String newId = eventDAO.generateNewId(eventSet); // Generate a new ID  
-        System.out.println("Event ID: " + newId);
+        System.out.println("Event ID: " + eventId);
 
         System.out.print("Enter event name: ");
         String name = scanner.nextLine().trim();
@@ -55,43 +53,35 @@ public class EventManagementUI {
         System.out.print("Enter event description: ");
         String description = scanner.nextLine().trim();
 
-        // Create a new Event and add it to the set  
-        Event newEvent = new Event(newId, name, date, location, description);
-        eventSet.add(newEvent);
-        System.out.println("\nEvent added successfully!");
-
+        // Create a new Event and return it  
+        Event newEvent = new Event(eventId, name, date, location, description);
         return newEvent; // Return the new event  
     }
 
-    public void removeEvent(HashSet<Event> eventSet) {
-        // Prompt user to enter the event ID to remove
+    public String removeEvent(HashMap<String, Event> eventMap) {
         boolean found = false;
+        String eventIdToRemove = null; // Variable to hold the event ID to remove  
         while (!found) {
             System.out.print("Enter the event ID to remove: ");
             String eventId = scanner.nextLine();
 
-            // Find the event in the HashSet
-            Event eventToRemove = null;
-            for (Event event : eventSet) {
-                if (event.getId().equals(eventId)) {
-                    eventToRemove = event;
-                    break;
-                }
-            }
+            // Find the event in the HashMap  
+            Event eventToRemove = eventMap.get(eventId);
 
             if (eventToRemove != null) {
-                // Remove from HashSet
-                eventSet.remove(eventToRemove);
-
+                // Remove from HashMap  
+                eventMap.remove(eventId);
+                eventIdToRemove = eventId; // Store the event ID to return later  
                 System.out.println("\nEvent " + eventToRemove.getName() + " removed successfully!");
                 found = true;
             } else {
                 System.out.println("\nEvent not found, please try again.");
             }
         }
+        return eventIdToRemove; // Return the event ID that was removed  
     }
 
-    public String updateEvent(TreeMap<String, Event> eventMap) {
+    public String updateEvent(HashMap<String, Event> eventMap) {
         Event event = null;
         String eventId;
 
@@ -99,7 +89,7 @@ public class EventManagementUI {
         eventId = scanner.nextLine().trim();
 
         if ("1".equals(eventId)) {
-            return null; // Return null if the user chooses to exit
+            return null; // Return null if the user chooses to exit  
         }
 
         event = eventMap.get(eventId);
@@ -138,10 +128,10 @@ public class EventManagementUI {
         event.setDescription(newDescription);
 
         System.out.println("Event details updated successfully.");
-        return eventId; // Return the ID of the updated event
+        return eventId; // Return the ID of the updated event  
     }
 
-    public void searchEvent(TreeMap<String, Event> eventMap) {
+    public void searchEvent(HashMap<String, Event> eventMap) {
         System.out.print("Enter Event ID to search: ");
         String eventId = scanner.nextLine();
         Event event = eventMap.get(eventId);
@@ -158,19 +148,19 @@ public class EventManagementUI {
         }
     }
 
-    public void listEvents(ListInterface<Event> eventList) {
+    public void listEvents(ArrayList<Event> eventList) {
         if (eventList.isEmpty()) {
             System.out.println("No events available.");
         } else {
-            System.out.println("\n|------------------------------------------------------------------------------------------|");
-            System.out.println("|                                      Event List                                          |");
-            System.out.println("|------------------------------------------------------------------------------------------|");
-            System.out.printf("| %-10s | %-20s | %-10s | %-20s | %-15s  |\n", "Event ID", "Name", "Date", "Location", "Description");
-            System.out.println("|------------------------------------------------------------------------------------------|");
+            System.out.println("\n|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+            System.out.println("|                                                                       Event List                                                                                    |");
+            System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+            System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s  |\n", "Event ID", "Name", "Date", "Location", "Description");
+            System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
 
             for (int i = 0; i < eventList.size(); i++) {
                 Event event = eventList.getEntry(i);
-                System.out.printf("| %-10s | %-20s | %-10s | %-20s | %-15s  |\n",
+                System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s  |\n",
                         event.getId(),
                         event.getName(),
                         event.getDate(),
@@ -179,16 +169,37 @@ public class EventManagementUI {
                 );
             }
 
-            System.out.println("|------------------------------------------------------------------------------------------|");
+            System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
         }
     }
 
-    public Volunteer selectVolunteer() {
+    public void listEventsForVolunteer(Volunteer volunteer, HashSet<Event> events) {
+        // Step 1: Display events for the selected volunteer  
+        System.out.println("Events for Volunteer ID: " + volunteer.getId());
+
+        // Check if events is null or empty  
+        if (events == null || events.isEmpty()) {
+            System.out.println("No events found for Volunteer ID: " + volunteer.getId());
+        } else {
+            // Use your custom `adt.ArrayList` for displaying  
+            adt.ArrayList<Event> eventList = new adt.ArrayList<>(); // Custom ADT  
+
+            // Add events to the custom ArrayList  
+            for (Event event : events) {
+                eventList.add(event);
+            }
+
+            // List events using ArrayList  
+            listEvents(eventList); // Pass the custom ADT `eventList`  
+        }
+    }
+
+    public Volunteer selectVolunteer(HashMap<String, Volunteer> volunteerMap) {
         System.out.print("Enter Volunteer ID to select: ");
         String volunteerId = scanner.nextLine();
 
-        // Fetch volunteer by ID
-        Volunteer volunteer = volunteerMap.get(volunteerId); // Ensure the correct map type
+        // Fetch volunteer by ID  
+        Volunteer volunteer = volunteerMap.get(volunteerId); // Ensure the correct map type  
 
         if (volunteer != null) {
             return volunteer;
@@ -198,89 +209,65 @@ public class EventManagementUI {
         }
     }
 
-    public void removeEventFromVolunteer(HashMap<Volunteer, HashSet<Event>> volunteerEvents) {
-        System.out.print("Enter Volunteer ID to remove an event from: ");
-        String volunteerId = scanner.nextLine();
-
-        Volunteer volunteer = null;
-        for (Volunteer v : volunteerEvents.keySet()) {
-            if (v.getId().equals(volunteerId)) {
-                volunteer = v;
-                break;
-            }
-        }
-
+    public void removeEventFromVolunteer(HashMap<Volunteer, HashSet<Event>> volunteerEvents, Volunteer volunteer) {
         if (volunteer != null) {
-            System.out.print("Enter Event ID to remove: ");
+            System.out.print("Enter Event ID to remove from Volunteer ID " + volunteer.getId() + ": ");
             String eventId = scanner.nextLine();
             HashSet<Event> events = volunteerEvents.get(volunteer);
 
-            Event eventToRemove = null;
-            for (Event event : events) {
-                if (event.getId().equals(eventId)) {
-                    eventToRemove = event;
-                    break;
-                }
-            }
-
-            if (eventToRemove != null) {
-                events.remove(eventToRemove);
-                System.out.println("Event removed from volunteer successfully.");
-            } else {
-                System.out.println("Event not found for this volunteer.");
-            }
-        } else {
-            System.out.println("Volunteer not found.");
-        }
-    }
-
-    public void listEventsForVolunteer(HashMap<Volunteer, HashSet<Event>> volunteerEvents) {
-        System.out.print("Enter Volunteer ID to list events: ");
-        String volunteerId = scanner.nextLine();
-
-        Volunteer volunteer = null;
-        for (Volunteer v : volunteerEvents.keySet()) {
-            if (v.getId().equals(volunteerId)) {
-                volunteer = v;
-                break;
-            }
-        }
-
-        if (volunteer != null) {
-            HashSet<Event> events = volunteerEvents.get(volunteer);
-            if (events.isEmpty()) {
-                System.out.println("No events found for this volunteer.");
-            } else {
-                System.out.println("Events for Volunteer ID: " + volunteerId);
-                // Use your custom `adt.ArrayList` for displaying
-                adt.ArrayList<Event> eventList = new adt.ArrayList<>(); // Custom ADT
+            if (events != null) { // Check if the volunteer has any events  
+                Event eventToRemove = null;
                 for (Event event : events) {
-                    eventList.add(event);
+                    if (event.getId().equals(eventId)) {
+                        eventToRemove = event;
+                        break;
+                    }
                 }
-                // List events using ArrayList
-                listEvents(eventList); // Pass the custom ADT `eventList`
+
+                if (eventToRemove != null) {
+                    events.remove(eventToRemove);
+                    System.out.println("Event removed from volunteer successfully.");
+                } else {
+                    System.out.println("Event not found for this volunteer.");
+                }
+            } else {
+                System.out.println("This volunteer has no associated events.");
             }
         } else {
             System.out.println("Volunteer not found.");
         }
     }
 
-    public void generateEventSummaryReport(ArrayList<Event> eventList) {
+    public void generateEventSummaryReport(ArrayList<Event> eventList, HashMap<String, Integer> eventParticipants, int totalVolunteers, int totalEvents, double averageEventsPerVolunteer) {
+        // Header for the Event Summary Report  
         System.out.println("Event Summary Report");
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
-        System.out.printf("| %-10s | %-20s | %-15s | %-15s | %-20s |\n", "ID", "Name", "Date", "Location", "Description");
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Summary Report");
+        System.out.println("\n|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+        System.out.println("|                                                                       Event List                                                                                    |");
+        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+        System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s | %-20s |\n", "Event ID", "Name", "Date", "Location", "Description", "Number Of Participants");
+        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
 
+        // Iterate through the events and print their details  
         for (Event event : eventList) {
-            System.out.printf("| %-10s | %-20s | %-15s | %-15s | %-20s |\n",
-                    event.getId(),
+            String eventId = event.getId();
+            int participantCount = eventParticipants.getOrDefault(eventId, 0); // Get number of participants  
+            System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s | %-20d |\n",
+                    eventId,
                     event.getName(),
                     event.getDate(),
                     event.getLocation(),
-                    event.getDescription()
-            );
+                    event.getDescription(),
+                    participantCount);
         }
 
-        System.out.println("--------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+
+        // Print total volunteers, total events, and average events per volunteer  
+        System.out.println("Total Volunteers: " + totalVolunteers);
+        System.out.println("Total Events: " + totalEvents);
+        System.out.printf("Average Events per Volunteer: %.2f%n", averageEventsPerVolunteer);
+        System.out.println("Participation Count:");
+        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
     }
 }
