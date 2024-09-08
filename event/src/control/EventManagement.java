@@ -285,22 +285,19 @@ public class EventManagement {
         }
 
         // Fetch full event details based on event IDs  
-        HashSet<Event> completeEventSet = new HashSet<>();
+        ArrayList<Event> completeEventList = new ArrayList<>(); // List to hold full event details  
         for (String eventId : eventIDs) {
             for (Event fullEvent : eventSet) { // Assuming eventSet is a HashSet<Event>  
                 if (fullEvent.getId().equals(eventId)) {
-                    completeEventSet.add(fullEvent); // Add the full event details to the HashSet  
+                    completeEventList.add(fullEvent); // Add the full event details to the list  
                     break; // Stop searching once the event is found  
                 }
             }
         }
 
-        // Prepare the list of event IDs for reporting  
-        ArrayList<String> eventIdList = new ArrayList<>(eventIDs); // This should work now  
-
         // Calculate total volunteers and total events  
         int totalVolunteers = volunteerMap.size(); // Total number of volunteers  
-        int totalEvents = eventIdList.size(); // Total number of events  
+        int totalEvents = completeEventList.size(); // Total number of events  
 
         // Calculate the total number of participants  
         int totalParticipants = 0;
@@ -312,7 +309,7 @@ public class EventManagement {
         double averageEventsPerVolunteer = totalVolunteers > 0 ? (double) totalParticipants / totalVolunteers : 0;
 
         // Call the boundary method to generate the report  
-        eventManagementUI.generateEventSummaryReport(eventIdList, eventParticipants, totalVolunteers, totalEvents, averageEventsPerVolunteer);
+        eventManagementUI.generateEventSummaryReport(completeEventList, eventParticipants, totalVolunteers, totalEvents, averageEventsPerVolunteer);
     }
 
     public void removeEventFromVolunteer() {
