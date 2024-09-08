@@ -8,56 +8,48 @@ package control;
  *
  * @author eyong
  */
-import adt.ArrayList;
-import adt.HashMap;
-import adt.HashSet;
+import adt.*;
 import dao.*;
 import boundary.EventManagementUI;
 import entity.*;
-
-import java.util.Iterator;
 import utility.MessageUI;
+
 
 public class EventManagement {
 
-    private ArrayList<Event> eventList = new ArrayList<>();
-    private HashSet<Event> eventSet = new HashSet<>(); // For adding and removing events  
-    private HashMap<String, Event> eventMap = new HashMap<>(); // For searching and updating events  
-    public HashMap<String, Volunteer> volunteerMap = new HashMap<>(); // For searching and updating events  
-    private HashMap<String, VolunteerEvent> volunteerEventMap = new HashMap<>();
-    private HashSet<VolunteerEvent> volunteerSet = new HashSet<>();
-    private HashMap<Volunteer, HashSet<Event>> volunteerEvents = new HashMap<>();
+    private SetInterface<Event> eventSet = new HashSet<>(); 
+    private MapInterface<String, Event> eventMap = new HashMap<>();
+    public MapInterface<String, Volunteer> volunteerMap = new HashMap<>(); 
+    private MapInterface<String, VolunteerEvent> volunteerEventMap = new HashMap<>();
+    private MapInterface<Volunteer, SetInterface<Event>> volunteerEvents = new HashMap<>();
     private final VolunteerEventDAO volunteerEventDAO;
     private final EventDAO eventDAO;
     private final VolunteerDAO volunteerDAO;
     private final EventManagementUI eventManagementUI;
-    private ArrayList<String> availableIDs = new ArrayList<>();
+    private ListInterface<String> availableIDs = new ArrayList<>();
 
     public EventManagement(String volunteerFilePath, String eventFilePath, String volunteerFile) {
         this.volunteerEventDAO = new VolunteerEventDAO(volunteerFilePath);
         this.eventDAO = new EventDAO(eventFilePath);
         this.volunteerDAO = new VolunteerDAO(volunteerFile);
         this.eventManagementUI = new EventManagementUI();
-
         loadAllEvents();
         loadVolunteerEvents();
     }
 
     private void loadAllEvents() {
-        eventList = eventDAO.loadIntoArrayList();
         eventSet = eventDAO.loadIntoHashSet();
         eventMap = eventDAO.loadIntoHashMap();
         volunteerEventMap = volunteerEventDAO.loadIntoHashMap();
-        volunteerSet = volunteerEventDAO.loadIntoHashSet();
         volunteerMap = volunteerDAO.loadIntoHashMap();
     }
 
     private void loadVolunteerEvents() {
         for (String volunteerId : volunteerEventMap.keySet()) {
             VolunteerEvent volunteerEvent = volunteerEventMap.get(volunteerId);
-            Volunteer volunteer = volunteerMap.get(volunteerId); // Get Volunteer object  
+            Volunteer volunteer = volunteerMap.get(volunteerId); 
             if (volunteer != null && volunteerEvent != null) {
-                HashSet<Event> events = volunteerEvent.getEvents();
+                SetInterface<Event> events = volunteerEvent.getEvents();
                 volunteerEvents.put(volunteer, events);
             }
         }
@@ -102,16 +94,15 @@ public class EventManagement {
     }
 
     public void addEvent() {
-        // Generate a unique event ID based on the current size of the eventSet  
+        // Generate event ID   
         String newId = generateEventID();
 
-        // Pass the new ID to the UI method to create a new event  
         Event newEvent = eventManagementUI.addEvent(eventSet, newId);
 
         if (newEvent != null) {
             eventSet.add(newEvent); // Add to the HashSet  
             eventMap.put(newEvent.getEventId(), newEvent); // Add to the HashMap
-            eventDAO.save(eventSet); // Save to the data store if needed  
+            eventDAO.save((HashSet<Event>) eventSet); // store data
             System.out.println("\nEvent added successfully!");
         }
     }
@@ -120,15 +111,13 @@ public class EventManagement {
         if (!availableIDs.isEmpty()) {
             return availableIDs.remove(availableIDs.size() - 1); // Use recycled ID  
         }
-
-        // Create a new ID based on the highest current ID  
-        int newIdNumber = 1; // Start from 1  
+        int newIdNumber = 1; 
         while (true) {
             String newId = String.format("E%03d", newIdNumber);
-            if (!eventMap.containsKey(newId)) { // Check if the ID is already in use  
+            if (!eventMap.containsKey(newId)) { 
                 return newId; // Return the new unique ID  
             }
-            newIdNumber++; // Increment to try the next ID  
+            newIdNumber++; 
         }
     }
 
@@ -136,21 +125,17 @@ public class EventManagement {
         String eventId = eventManagementUI.removeEvent(eventMap);
         if (eventId != null) {
             Event eventToRemove = null;
-
-            // Find the event to remove based on the eventId  
+            // Find the event 
             for (Event event : eventSet) {
                 if (event.getEventId().equals(eventId)) {
-                    eventToRemove = event; // Store the event to remove  
-                    break; // Exit the loop once found  
+                    eventToRemove = event; 
+                    break; 
                 }
             }
-
-            // If the event was found, remove it using the custom remove method  
             if (eventToRemove != null) {
-                boolean removed = eventSet.remove(eventToRemove); // Use the custom remove method  
+                boolean removed = eventSet.remove(eventToRemove);
                 if (removed) {
-                    eventDAO.save(eventSet); // Save the updated set to the data store  
-                    //System.out.println("\nEvent removed successfully!");
+                    eventDAO.save((HashSet<Event>) eventSet); 
                 } else {
                     System.out.println("\nFailed to remove the event.");
                 }
@@ -165,16 +150,10 @@ public class EventManagement {
         if (eventId != null) {
             Event event = eventMap.get(eventId);
             if (event != null) {
-                // Remove the old event from the eventSet  
                 eventSet.remove(event);
-
-                // The event object is already updated through the UI method  
-                // Add the updated event back to the eventSet  
                 eventSet.add(event);
-
-                // Save the updated event set to the data store  
-                eventDAO.save(eventSet);
-                //System.out.println("Event updated successfully!");
+                eventDAO.save((HashSet<Event>) eventSet);
+                System.out.println("Event updated successfully!");
             } else {
                 System.out.println("Event not found.");
             }
@@ -184,116 +163,102 @@ public class EventManagement {
     }
 
     public void searchEvent() {
-
         eventManagementUI.searchEvent(eventMap);
     }
 
     public void listAllEvents() {
-        eventList = eventDAO.loadIntoArrayList();
+        ListInterface<Event> eventList = eventDAO.loadIntoArrayList();
+        // Sort
+        for (int i = 0; i < eventList.size() - 1; i++) {
+            for (int j = 0; j < eventList.size() - 1 - i; j++) {
+                Event event1 = eventList.getEntry(j);
+                Event event2 = eventList.getEntry(j + 1);
+
+                // Compare event IDs
+                if (event1.getEventId().compareTo(event2.getEventId()) > 0) {
+                    eventList.replace(j, event2);
+                    eventList.replace(j + 1, event1);
+                }
+            }
+        }
         eventManagementUI.listEvents(eventList);
     }
 
     public void generateEventSummaryReport() {
-        HashMap<String, Integer> eventParticipants = new HashMap<>(); // To store participant counts for each event  
+        MapInterface<String, Integer> eventParticipants = new HashMap<>(); 
 
-        // Iterate through the volunteerEventMap to count participants for each event  
-        for (String volunteerId : volunteerEventMap.keySet()) {
-            // Get the VolunteerEvent object for the volunteerId  
-            VolunteerEvent volunteerEvent = volunteerEventMap.get(volunteerId); // Assuming this returns the VolunteerEvent object for the volunteer  
-
-            // Get the events associated with this VolunteerEvent  
-            for (Event event : volunteerEvent.getEvents()) {
-                String eventId = event.getEventId(); // Assuming Event has a method getId() that returns the event ID  
-
-                // Increment the participant count for the event  
-                eventParticipants.put(eventId, eventParticipants.getOrDefault(eventId, 0) + 1);
-            }
-        }
-
-        // Collect event IDs for reporting  
-        HashSet<String> eventIDs = new HashSet<>(); // Use a HashSet to avoid duplicates  
         for (String volunteerId : volunteerEventMap.keySet()) {
             VolunteerEvent volunteerEvent = volunteerEventMap.get(volunteerId);
             for (Event event : volunteerEvent.getEvents()) {
-                eventIDs.add(event.getEventId()); // Collect only event IDs  
+                String eventId = event.getEventId();
+                int currentCount = eventParticipants.getOrDefault(eventId, 0);
+                eventParticipants.put(eventId, currentCount + 1); 
             }
         }
 
-        // Fetch full event details based on event IDs  
-        ArrayList<Event> completeEventList = new ArrayList<>(); // List to hold full event details  
-        for (String eventId : eventIDs) {
-            for (Event fullEvent : eventSet) { // Assuming eventSet is a HashSet<Event>  
-                if (fullEvent.getEventId().equals(eventId)) {
-                    completeEventList.add(fullEvent); // Add the full event details to the list  
-                    break; // Stop searching once the event is found  
+        ListInterface<Event> completeEventList = eventDAO.loadIntoArrayList();
+
+        for (int i = 0; i < completeEventList.size() - 1; i++) {
+            for (int j = 0; j < completeEventList.size() - 1 - i; j++) {
+                Event event1 = completeEventList.getEntry(j);
+                Event event2 = completeEventList.getEntry(j + 1);
+
+                if (event1.getEventId().compareTo(event2.getEventId()) > 0) {
+                    completeEventList.replace(j, event2);
+                    completeEventList.replace(j + 1, event1);
                 }
             }
         }
 
-        // Calculate total volunteers and total events  
-        int totalVolunteers = volunteerMap.size(); // Total number of volunteers  
-        int totalEvents = completeEventList.size(); // Total number of events  
+        int totalVolunteers = volunteerMap.size(); // Total number of volunteers
+        int totalEvents = completeEventList.size(); // Total number of events
 
-        // Calculate the total number of participants  
+        // Calculate total participants
         int totalParticipants = 0;
-        for (int count : eventParticipants.values()) {
-            totalParticipants += count; // Sum up the participant counts  
+        for (String eventId : eventParticipants.keySet()) {
+            totalParticipants += eventParticipants.get(eventId);
         }
-
-        // Calculate average events per volunteer  
         double averageEventsPerVolunteer = totalVolunteers > 0 ? (double) totalParticipants / totalVolunteers : 0;
-
-        // Call the boundary method to generate the report  
         eventManagementUI.generateEventSummaryReport(completeEventList, eventParticipants, totalVolunteers, totalEvents, averageEventsPerVolunteer);
     }
 
     public void removeEventFromVolunteer() {
-        Volunteer volunteer = eventManagementUI.selectVolunteer(volunteerMap); // Step 1: Select a volunteer  
+        Volunteer volunteer = eventManagementUI.selectVolunteer(volunteerMap);
         if (volunteer != null) {
-            // Step 2: Call the boundary method to remove the event  
-            eventManagementUI.removeEventFromVolunteer(volunteerEvents, volunteer); // Pass the volunteerEvents map and the selected volunteer  
-
-            // Step 3: Save changes to the DAO (no need to update the map again as it's done already)  
-            volunteerEventDAO.save(volunteerEvents); // Pass the volunteerEvents directly to save  
+            eventManagementUI.removeEventFromVolunteer(volunteerEvents, volunteer); 
+            volunteerEventDAO.save(volunteerEvents); 
         } else {
-            System.out.println("No volunteer selected."); // Output message directly  
+            System.out.println("No volunteer selected."); 
         }
     }
 
     public void listEventsForVolunteer() {
-        Volunteer volunteer = eventManagementUI.selectVolunteer(volunteerMap); // Step 1: Select a volunteer  
+        Volunteer volunteer = eventManagementUI.selectVolunteer(volunteerMap); 
         if (volunteer != null) {
-            // Step 2: Retrieve event IDs for the selected volunteer using the volunteerEvents map  
-            HashSet<Event> eventIDs = volunteerEvents.get(volunteer); // Get the events based on volunteer  
+            SetInterface<Event> eventIDs = volunteerEvents.get(volunteer);  
 
-            // Step 3: Check if the retrieved events are null or empty  
             if (eventIDs == null || eventIDs.isEmpty()) {
-                System.out.println("No events found for Volunteer ID: " + volunteer.getVolunteerId()); // Output message directly  
+                System.out.println("No events found for Volunteer ID: " + volunteer.getVolunteerId()); 
             } else {
-                // Prepare a HashSet to hold full event details  
-                HashSet<Event> completeEventSet = new HashSet<>();
+                SetInterface<Event> completeEventSet = new HashSet<>();
 
-                // Step 4: Populate the complete event details from the local eventSet  
                 for (Event event : eventIDs) {
-                    // Find the event in the eventSet (assuming eventSet contains all event details)  
                     for (Event fullEvent : eventSet) {
                         if (fullEvent.getEventId().equals(event.getEventId())) {
-                            completeEventSet.add(fullEvent); // Add the full event details to the HashSet  
-                            break; // Stop searching once the event is found  
+                            completeEventSet.add(fullEvent);  
+                            break; 
                         }
                     }
                 }
-
-                // Step 5: Display the complete events using the UI  
-                eventManagementUI.listEventsForVolunteer(volunteer, completeEventSet); // Pass the selected volunteer and their full event details  
+                eventManagementUI.listEventsForVolunteer(volunteer, completeEventSet);
             }
         } else {
-            System.out.println("No volunteer selected."); // Output message directly  
+            System.out.println("No volunteer selected."); 
         }
     }
 
     public static void main(String[] args) {
-        // Passing file paths for volunteer and event data files:  
+        // Passing file paths 
         EventManagement eventManagement = new EventManagement("volunteer_event.txt", "events.txt", "volunteer.txt");
         eventManagement.runEventManagement();
     }

@@ -1,10 +1,16 @@
 /*
-Created by Chia Yuxuan,Darren Tan Ke Yu,Kevin Er Yong Xian, Lee Zhi Hua
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package adt;
 
 
-public interface ListInterface<T> {
+/**
+ *
+ * Created by ChiaYuxuan,DarrenTanKeYu,LeeZhiHua,KevinErYongXian
+ */
+
+public interface ListInterface<T> extends Iterable<T>{
 
     boolean add(T element);
 

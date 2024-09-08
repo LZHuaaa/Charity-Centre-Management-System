@@ -9,7 +9,6 @@ public class EventManagementUI {
 
     private EventDAO eventDAO = new EventDAO();
     private Scanner scanner = new Scanner(System.in);
-//    private final HashMap<String, Volunteer> volunteerMap = new HashMap<>();
 
     public int menu() {
         System.out.println("\nEvent Management System");
@@ -24,12 +23,12 @@ public class EventManagementUI {
         System.out.println("0. Exit");
         System.out.print("Select an option: ");
         int choice = scanner.nextInt();
-        scanner.nextLine(); // Consume newline  
+        scanner.nextLine();
         System.out.println();
         return choice;
     }
 
-    public Event addEvent(HashSet<Event> eventSet, String eventId) {
+    public Event addEvent(SetInterface<Event> eventSet, String eventId) {
         System.out.println("--- Please enter the event details ---");
 
         System.out.println("Event ID: " + eventId);
@@ -59,30 +58,29 @@ public class EventManagementUI {
         return newEvent; // Return the new event  
     }
 
-    public String removeEvent(HashMap<String, Event> eventMap) {
+    public String removeEvent(MapInterface<String, Event> eventMap) {
         boolean found = false;
-        String eventIdToRemove = null; // Variable to hold the event ID to remove  
+        String eventIdToRemove = null;
         while (!found) {
             System.out.print("Enter the event ID to remove: ");
             String eventId = scanner.nextLine();
 
-            // Find the event in the HashMap  
             Event eventToRemove = eventMap.get(eventId);
 
             if (eventToRemove != null) {
                 // Remove from HashMap  
                 eventMap.remove(eventId);
-                eventIdToRemove = eventId; // Store the event ID to return later  
+                eventIdToRemove = eventId;
                 System.out.println("\nEvent " + eventToRemove.getName() + " removed successfully!");
                 found = true;
             } else {
                 System.out.println("\nEvent not found, please try again.");
             }
         }
-        return eventIdToRemove; // Return the event ID that was removed  
+        return eventIdToRemove;
     }
 
-    public String updateEvent(HashMap<String, Event> eventMap) {
+    public String updateEvent(MapInterface<String, Event> eventMap) {
         Event event = null;
         String eventId;
 
@@ -90,7 +88,7 @@ public class EventManagementUI {
         eventId = scanner.nextLine().trim();
 
         if ("1".equals(eventId)) {
-            return null; // Return null if the user chooses to exit  
+            return null;
         }
 
         event = eventMap.get(eventId);
@@ -129,27 +127,32 @@ public class EventManagementUI {
         event.setDescription(newDescription);
 
         System.out.println("Event details updated successfully.");
-        return eventId; // Return the ID of the updated event  
+        return eventId;
     }
 
-    public void searchEvent(HashMap<String, Event> eventMap) {
+    public void searchEvent(MapInterface<String, Event> eventMap) {
         System.out.print("Enter Event ID to search: ");
         String eventId = scanner.nextLine();
         Event event = eventMap.get(eventId);
 
         if (event != null) {
-            System.out.println("\n--Event Found--");
-            System.out.println("ID: " + event.getEventId());
-            System.out.println("Name: " + event.getName());
-            System.out.println("Date: " + event.getDate());
-            System.out.println("Location: " + event.getLocation());
-            System.out.println("Description: " + event.getDescription());
+            System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+            System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s  |\n", "Event ID", "Name", "Date", "Location", "Description");
+            System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+            System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s  |\n",
+                    event.getEventId(),
+                    event.getName(),
+                    event.getDate(),
+                    event.getLocation(),
+                    event.getDescription());
+            System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+
         } else {
             System.out.println("No event found with ID: " + eventId);
         }
     }
 
-    public void listEvents(ArrayList<Event> eventList) {
+    public void listEvents(ListInterface<Event> eventList) {
         if (eventList.isEmpty()) {
             System.out.println("No events available.");
         } else {
@@ -174,32 +177,29 @@ public class EventManagementUI {
         }
     }
 
-    public void listEventsForVolunteer(Volunteer volunteer, HashSet<Event> events) {
-        // Step 1: Display events for the selected volunteer  
+    public void listEventsForVolunteer(Volunteer volunteer, SetInterface<Event> events) {
+
         System.out.println("Events for Volunteer ID: " + volunteer.getVolunteerId());
 
-        // Check if events is null or empty  
         if (events == null || events.isEmpty()) {
             System.out.println("No events found for Volunteer ID: " + volunteer.getVolunteerId());
         } else {
-            // Use your custom `adt.ArrayList` for displaying  
+
             adt.ArrayList<Event> eventList = new adt.ArrayList<>(); // Custom ADT  
 
-            // Add events to the custom ArrayList  
             for (Event event : events) {
                 eventList.add(event);
             }
 
-            // List events using ArrayList  
-            listEvents(eventList); // Pass the custom ADT `eventList`  
+            listEvents(eventList);
         }
     }
 
-    public Volunteer selectVolunteer(HashMap<String, Volunteer> volunteerMap) {
+    public Volunteer selectVolunteer(MapInterface<String, Volunteer> volunteerMap) {
         System.out.print("Enter Volunteer ID to select: ");
         String volunteerId = scanner.nextLine();
 
-        Volunteer volunteer = volunteerMap.get(volunteerId); // Ensure the correct map type  
+        Volunteer volunteer = volunteerMap.get(volunteerId);
 
         if (volunteer != null) {
             return volunteer;
@@ -209,13 +209,13 @@ public class EventManagementUI {
         }
     }
 
-    public void removeEventFromVolunteer(HashMap<Volunteer, HashSet<Event>> volunteerEvents, Volunteer volunteer) {
+    public void removeEventFromVolunteer(MapInterface<Volunteer, SetInterface<Event>> volunteerEvents, Volunteer volunteer) {
         if (volunteer != null) {
             System.out.print("Enter Event ID to remove from Volunteer ID " + volunteer.getVolunteerId() + ": ");
             String eventId = scanner.nextLine();
-            HashSet<Event> events = volunteerEvents.get(volunteer);
+            SetInterface<Event> events = volunteerEvents.get(volunteer);
 
-            if (events != null) { // Check if the volunteer has any events  
+            if (events != null) {
                 Event eventToRemove = null;
                 for (Event event : events) {
                     if (event.getEventId().equals(eventId)) {
@@ -226,7 +226,7 @@ public class EventManagementUI {
 
                 if (eventToRemove != null) {
                     events.remove(eventToRemove);
-                    // System.out.println("Event removed from volunteer successfully.");
+
                 } else {
                     System.out.println("Event not found for this volunteer.");
                 }
@@ -238,16 +238,23 @@ public class EventManagementUI {
         }
     }
 
-    public void generateEventSummaryReport(ArrayList<Event> eventList, HashMap<String, Integer> eventParticipants, int totalVolunteers, int totalEvents, double averageEventsPerVolunteer) {
-        // Header for the Event Summary Report  
+    public void generateEventSummaryReport(
+            ListInterface<Event> eventList,
+            MapInterface<String, Integer> eventParticipants,
+            int totalVolunteers,
+            int totalEvents,
+            double averageEventsPerVolunteer
+    ) {
+        
         System.out.println("\t\t\t\t\t\t\t\t\t\tEvent Summary Report");
         System.out.println("\n|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
         System.out.println("|                                                                                 Event List                                                                                                  |");
         System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
         System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s | %-20s |\n", "Event ID", "Name", "Date", "Location", "Description", "Number Of Participants");
         System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
-        // Iterate through the events and print their details  
-        for (Event event : eventList) {
+ 
+        for (int i = 0; i < eventList.size(); i++) {
+            Event event = eventList.getEntry(i); 
             String eventId = event.getEventId();
             int participantCount = eventParticipants.getOrDefault(eventId, 0); // Get number of participants  
             System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s | %-22d |\n",
@@ -266,7 +273,7 @@ public class EventManagementUI {
             totalParticipants += count; // Sum up the participant counts
         }
 
-        // Print total volunteers, total events, and average events per volunteer  
+        
         System.out.printf("| Total Volunteers: %-169d |\n", totalVolunteers);
         System.out.printf("| Total Events: %-173d |\n", totalEvents);
         System.out.printf("| Total Participants: %-167d |\n", totalParticipants);

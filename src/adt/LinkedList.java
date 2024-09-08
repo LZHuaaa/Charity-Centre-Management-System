@@ -4,8 +4,7 @@
  */
 package adt;
 import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.function.Consumer;
+
 /**
  *
  * @author leezh
@@ -36,15 +35,7 @@ public class LinkedList<T> implements ListInterface<T> , Iterable<T> {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    @Override
-    public void forEach(Consumer<? super T> action) {
-        Iterable.super.forEach(action); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
-    }
-
-    @Override
-    public Spliterator<T> spliterator() {
-        return Iterable.super.spliterator(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
-    }
+  
 
     @Override
     public boolean clear() {

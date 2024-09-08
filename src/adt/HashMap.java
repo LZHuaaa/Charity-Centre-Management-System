@@ -8,7 +8,7 @@ package adt;
 
 /**
  *
- * @author leezh
+ * @author leezhihua
  */
 public class HashMap<K, V> implements MapInterface<K, V> {
 

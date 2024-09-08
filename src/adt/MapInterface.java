@@ -6,7 +6,7 @@ package adt;
 
 /**
  *
- * @author leezh
+ * @author leezhihua
  */
 public interface MapInterface<K, V> {
 
@@ -31,4 +31,6 @@ public interface MapInterface<K, V> {
     void clear();
 
     Set<K> keySet();
+    
+    V getOrDefault(K key, V defaultValue);
 }
