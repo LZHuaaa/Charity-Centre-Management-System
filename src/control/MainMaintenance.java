@@ -21,7 +21,7 @@ public class MainMaintenance {
             choice = ui.menu();
             switch (choice) {
                 case 0:
-                    System.out.println("\nExiting...Thank you for using our system.");
+                    System.out.println("\nExiting...Thank you for using our system ^_^ !");
                     break;
                 case 1:
                     new DonorUI().run();
@@ -33,8 +33,7 @@ public class MainMaintenance {
                     new VolunteerUI().start();
                     break;
                 case 4:
-                    EventManagement eventManagement = new EventManagement("volunteer_event.txt", "events.txt", "volunteer.txt");
-                    eventManagement.runEventManagement();
+                    new EventManagement("volunteer_event.txt", "events.txt", "volunteer.txt").runEventManagement();   
                     break;
 
                 default:

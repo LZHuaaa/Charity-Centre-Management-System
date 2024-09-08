@@ -199,7 +199,6 @@ public class EventManagementUI {
         System.out.print("Enter Volunteer ID to select: ");
         String volunteerId = scanner.nextLine();
 
-        // Fetch volunteer by ID  
         Volunteer volunteer = volunteerMap.get(volunteerId); // Ensure the correct map type  
 
         if (volunteer != null) {
@@ -227,7 +226,7 @@ public class EventManagementUI {
 
                 if (eventToRemove != null) {
                     events.remove(eventToRemove);
-                    System.out.println("Event removed from volunteer successfully.");
+                    // System.out.println("Event removed from volunteer successfully.");
                 } else {
                     System.out.println("Event not found for this volunteer.");
                 }
@@ -241,19 +240,17 @@ public class EventManagementUI {
 
     public void generateEventSummaryReport(ArrayList<Event> eventList, HashMap<String, Integer> eventParticipants, int totalVolunteers, int totalEvents, double averageEventsPerVolunteer) {
         // Header for the Event Summary Report  
-        System.out.println("Event Summary Report");
-        System.out.println("Summary Report");
-        System.out.println("\n|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
-        System.out.println("|                                                                       Event List                                                                                    |");
-        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+        System.out.println("\t\t\t\t\t\t\t\t\t\tEvent Summary Report");
+        System.out.println("\n|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+        System.out.println("|                                                                                 Event List                                                                                                  |");
+        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
         System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s | %-20s |\n", "Event ID", "Name", "Date", "Location", "Description", "Number Of Participants");
-        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
-
+        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
         // Iterate through the events and print their details  
         for (Event event : eventList) {
             String eventId = event.getEventId();
             int participantCount = eventParticipants.getOrDefault(eventId, 0); // Get number of participants  
-            System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s | %-20d |\n",
+            System.out.printf("| %-10s | %-35s | %-10s | %-20s | %-75s | %-22d |\n",
                     eventId,
                     event.getName(),
                     event.getDate(),
@@ -262,13 +259,18 @@ public class EventManagementUI {
                     participantCount);
         }
 
-        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+
+        int totalParticipants = 0;
+        for (int count : eventParticipants.values()) {
+            totalParticipants += count; // Sum up the participant counts
+        }
 
         // Print total volunteers, total events, and average events per volunteer  
-        System.out.println("Total Volunteers: " + totalVolunteers);
-        System.out.println("Total Events: " + totalEvents);
-        System.out.printf("Average Events per Volunteer: %.2f%n", averageEventsPerVolunteer);
-        System.out.println("Participation Count:");
-        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+        System.out.printf("| Total Volunteers: %-169d |\n", totalVolunteers);
+        System.out.printf("| Total Events: %-173d |\n", totalEvents);
+        System.out.printf("| Total Participants: %-167d |\n", totalParticipants);
+        System.out.printf("| Average Events per Volunteer: %-157.2f |\n", averageEventsPerVolunteer);
+        System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
     }
 }

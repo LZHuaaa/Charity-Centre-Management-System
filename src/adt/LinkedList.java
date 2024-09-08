@@ -15,10 +15,6 @@ public class LinkedList<T> implements ListInterface<T> , Iterable<T> {
     private Node<T> head;
     private int size;
 
-    @Override
-    public boolean remove(T element) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
 
     @Override
     public boolean isFull() {
@@ -129,6 +125,29 @@ public class LinkedList<T> implements ListInterface<T> , Iterable<T> {
 
         size--;
         return current.data;
+    }
+    
+     @Override
+    public boolean remove(T element) {
+        if (head == null || element == null) {
+            return false;
+        }
+        Node<T> current = head;
+        Node<T> previous = null;
+        while (current != null) {
+            if (current.data.equals(element)) {
+                if (previous == null) {
+                    head = current.next;  // Remove head
+                } else {
+                    previous.next = current.next;  // Bypass the node to remove
+                }
+                size--;
+                return true;
+            }
+            previous = current;
+            current = current.next;
+        }
+        return false;  // Element not found
     }
     
 
