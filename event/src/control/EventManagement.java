@@ -259,56 +259,77 @@ public class EventManagement {
     }
 
     public void generateEventSummaryReport() {
-        HashMap<String, Integer> eventParticipants = new HashMap<>(); // To store participant counts for each event  
+        HashMap<String, Integer> eventParticipants = new HashMap<>(); // Use your custom map
 
-        // Iterate through the volunteerEventMap to count participants for each event  
+        // Iterate through the volunteerEventMap to count participants for each event
+        System.out.println("---- Debug: Starting participant count ----");
         for (String volunteerId : volunteerEventMap.keySet()) {
-            // Get the VolunteerEvent object for the volunteerId  
-            VolunteerEvent volunteerEvent = volunteerEventMap.get(volunteerId); // Assuming this returns the VolunteerEvent object for the volunteer  
+            VolunteerEvent volunteerEvent = volunteerEventMap.get(volunteerId);
 
-            // Get the events associated with this VolunteerEvent  
+            System.out.println("Volunteer ID: " + volunteerId); // Debug: Print volunteer ID
             for (Event event : volunteerEvent.getEvents()) {
-                String eventId = event.getId(); // Assuming Event has a method getId() that returns the event ID  
+                String eventId = event.getId();
 
-                // Increment the participant count for the event  
-                eventParticipants.put(eventId, eventParticipants.getOrDefault(eventId, 0) + 1);
+                // Correct the logic to increment the count for each event
+                int currentCount = eventParticipants.getOrDefault(eventId, 0); // Get the current count (0 if it doesn't exist)
+                System.out.println("Debug (before put): Event ID = " + eventId + " | Current Count = " + currentCount);
+
+                // Increment the count
+                eventParticipants.put(eventId, currentCount + 1);
+
+                // Debug: Verify if the put worked
+                System.out.println("Debug (after put): Event ID = " + eventId + " | Updated Count = " + eventParticipants.get(eventId));
             }
         }
 
-        // Collect event IDs for reporting  
-        HashSet<String> eventIDs = new HashSet<>(); // Use a HashSet to avoid duplicates  
+        // The rest of the logic remains unchanged
+        // Collect event IDs for reporting
+        HashSet<String> eventIDs = new HashSet<>();
+        System.out.println("---- Debug: Collecting event IDs ----");
         for (String volunteerId : volunteerEventMap.keySet()) {
             VolunteerEvent volunteerEvent = volunteerEventMap.get(volunteerId);
             for (Event event : volunteerEvent.getEvents()) {
-                eventIDs.add(event.getId()); // Collect only event IDs  
+                eventIDs.add(event.getId());
             }
         }
 
-        // Fetch full event details based on event IDs  
-        ArrayList<Event> completeEventList = new ArrayList<>(); // List to hold full event details  
+        // Fetch full event details based on event IDs
+        ArrayList<Event> completeEventList = new ArrayList<>();
         for (String eventId : eventIDs) {
-            for (Event fullEvent : eventSet) { // Assuming eventSet is a HashSet<Event>  
+            for (Event fullEvent : eventSet) {
                 if (fullEvent.getId().equals(eventId)) {
-                    completeEventList.add(fullEvent); // Add the full event details to the list  
-                    break; // Stop searching once the event is found  
+                    completeEventList.add(fullEvent);
+                    break;
                 }
             }
         }
 
-        // Calculate total volunteers and total events  
-        int totalVolunteers = volunteerMap.size(); // Total number of volunteers  
-        int totalEvents = completeEventList.size(); // Total number of events  
-
-        // Calculate the total number of participants  
-        int totalParticipants = 0;
-        for (int count : eventParticipants.values()) {
-            totalParticipants += count; // Sum up the participant counts  
+        // Debug: Print event list
+        System.out.println("---- Debug: Complete Event List ----");
+        for (Event event : completeEventList) {
+            System.out.println("Event ID: " + event.getId() + " | Event Name: " + event.getName());
         }
 
-        // Calculate average events per volunteer  
+        int totalVolunteers = volunteerMap.size(); // Total number of volunteers
+        int totalEvents = completeEventList.size(); // Total number of events
+
+        // Calculate total participants
+        int totalParticipants = 0;
+        System.out.println("---- Debug: Calculating total participants ----");
+        for (int count : eventParticipants.values()) {
+            totalParticipants += count;
+            System.out.println("Participant Count: " + count); // Debug: Print participant count for each event
+        }
+
         double averageEventsPerVolunteer = totalVolunteers > 0 ? (double) totalParticipants / totalVolunteers : 0;
 
-        // Call the boundary method to generate the report  
+        // Debug: Final counts
+        System.out.println("Total Volunteers: " + totalVolunteers);
+        System.out.println("Total Events: " + totalEvents);
+        System.out.println("Total Participants: " + totalParticipants);
+        System.out.printf("Average Events per Volunteer: %.2f%n", averageEventsPerVolunteer);
+
+        // Call the boundary method to generate the report
         eventManagementUI.generateEventSummaryReport(completeEventList, eventParticipants, totalVolunteers, totalEvents, averageEventsPerVolunteer);
     }
 

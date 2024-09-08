@@ -263,11 +263,17 @@ public class EventManagementUI {
 
         System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
 
-        // Print total volunteers, total events, and average events per volunteer  
+        // Calculate total participants
+        int totalParticipants = 0;
+        for (int count : eventParticipants.values()) {
+            totalParticipants += count; // Sum up the participant counts
+        }
+
+        // Print total volunteers, total events, total participants, and average events per volunteer  
         System.out.println("Total Volunteers: " + totalVolunteers);
         System.out.println("Total Events: " + totalEvents);
+        System.out.println("Total Participants: " + totalParticipants);
         System.out.printf("Average Events per Volunteer: %.2f%n", averageEventsPerVolunteer);
-        System.out.println("Participation Count:");
         System.out.println("|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|");
     }
 }

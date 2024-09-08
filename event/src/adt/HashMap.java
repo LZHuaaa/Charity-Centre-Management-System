@@ -35,18 +35,24 @@ public class HashMap<K, V> implements MapInterface<K, V> {
         newNode.value = value;
 
         if (bucketArray[index] == null) {
+            // No collision, directly insert
             bucketArray[index] = newNode;
         } else {
             // Collision handling using chaining
             HashMap<K, V> current = bucketArray[index];
-            while (current.next != null) {
+            while (current != null) {
                 if (current.key.equals(key)) {
-                    current.value = value; // Update the value if key already exists
+                    // If the key already exists, update the value and return
+                    current.value = value;
                     return;
+                }
+                if (current.next == null) {
+                    // Append new node if reached end of chain
+                    current.next = newNode;
+                    break;
                 }
                 current = current.next;
             }
-            current.next = newNode; // Add the new node to the end of the chain
         }
         size++;
     }
@@ -192,10 +198,10 @@ public class HashMap<K, V> implements MapInterface<K, V> {
         }
         return keySet;
     }
-    
-    public V getOrDefault(K key, V defaultValue) {  
-        V value = get(key); // Use the existing get method  
-        return (value != null) ? value : defaultValue; // Return the value or the default  
-    }  
+
+    public V getOrDefault(K key, V defaultValue) {
+        V value = get(key);
+        return (value != null) ? value : defaultValue;
+    }
 
 }
