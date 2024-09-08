@@ -43,7 +43,6 @@ public class VolunteerEventDAO {
                     VolunteerEvent volunteerEvent = new VolunteerEvent(volunteer);
                     volunteerEvent.addEvent(event); // Associate the event with the volunteer  
                     volunteerEvents.add(volunteerEvent); // Add relationship to HashSet  
-                    System.out.println("Loaded Volunteer-Event: " + volunteerId + " - " + eventId);
                 } else {
                     System.out.println("Invalid data length for line: " + line);
                 }
@@ -51,7 +50,6 @@ public class VolunteerEventDAO {
         } catch (IOException e) {
             e.printStackTrace(); // Handle any IO exceptions  
         }
-        System.out.println("Total volunteer-events loaded: " + volunteerEvents.size()); // Print total loaded Volunteer-Events  
         return volunteerEvents; // Return loaded Volunteer-Events  
     }
 
@@ -123,7 +121,6 @@ public class VolunteerEventDAO {
                     VolunteerEvent volunteerEvent = new VolunteerEvent(volunteer);
                     volunteerEvent.addEvent(event); // Associate the event with the volunteer  
                     volunteerEventList.add(volunteerEvent); // Add relationship to the ArrayList  
-                    System.out.println("Loaded Volunteer-Event into ArrayList: " + volunteerId + " - " + eventId);
                 } else {
                     System.out.println("Invalid data length for line: " + line);
                 }
@@ -131,7 +128,6 @@ public class VolunteerEventDAO {
         } catch (IOException e) {
             e.printStackTrace(); // Handle any IO exceptions  
         }
-        System.out.println("Total volunteer-events loaded into ArrayList: " + volunteerEventList.size()); // Print total loaded volunteer-events  
         return volunteerEventList; // Return the populated ArrayList  
     }
 }

@@ -254,7 +254,25 @@ public class EventManagement {
     }
 
     public void listAllEvents() {
-        eventList = eventDAO.loadIntoArrayList();
+        // Load all events using eventDAO (which includes complete details)
+        ArrayList<Event> eventList = eventDAO.loadIntoArrayList();
+
+        // Sort the event list based on event IDs using available methods (getEntry, replace)
+        for (int i = 0; i < eventList.size() - 1; i++) {
+            for (int j = 0; j < eventList.size() - 1 - i; j++) {
+                Event event1 = eventList.getEntry(j);
+                Event event2 = eventList.getEntry(j + 1);
+
+                // Compare event IDs
+                if (event1.getId().compareTo(event2.getId()) > 0) {
+                    // Swap the events using replace method
+                    eventList.replace(j, event2);
+                    eventList.replace(j + 1, event1);
+                }
+            }
+        }
+
+        // Pass the sorted eventList to the UI
         eventManagementUI.listEvents(eventList);
     }
 
@@ -262,52 +280,31 @@ public class EventManagement {
         HashMap<String, Integer> eventParticipants = new HashMap<>(); // Use your custom map
 
         // Iterate through the volunteerEventMap to count participants for each event
-        System.out.println("---- Debug: Starting participant count ----");
         for (String volunteerId : volunteerEventMap.keySet()) {
             VolunteerEvent volunteerEvent = volunteerEventMap.get(volunteerId);
-
-            System.out.println("Volunteer ID: " + volunteerId); // Debug: Print volunteer ID
             for (Event event : volunteerEvent.getEvents()) {
                 String eventId = event.getId();
-
-                // Correct the logic to increment the count for each event
                 int currentCount = eventParticipants.getOrDefault(eventId, 0); // Get the current count (0 if it doesn't exist)
-                System.out.println("Debug (before put): Event ID = " + eventId + " | Current Count = " + currentCount);
-
-                // Increment the count
-                eventParticipants.put(eventId, currentCount + 1);
-
-                // Debug: Verify if the put worked
-                System.out.println("Debug (after put): Event ID = " + eventId + " | Updated Count = " + eventParticipants.get(eventId));
+                eventParticipants.put(eventId, currentCount + 1); // Increment the count
             }
         }
 
-        // The rest of the logic remains unchanged
-        // Collect event IDs for reporting
-        HashSet<String> eventIDs = new HashSet<>();
-        System.out.println("---- Debug: Collecting event IDs ----");
-        for (String volunteerId : volunteerEventMap.keySet()) {
-            VolunteerEvent volunteerEvent = volunteerEventMap.get(volunteerId);
-            for (Event event : volunteerEvent.getEvents()) {
-                eventIDs.add(event.getId());
-            }
-        }
+        // Load all events using eventDAO (which includes complete details)
+        ArrayList<Event> completeEventList = eventDAO.loadIntoArrayList();
 
-        // Fetch full event details based on event IDs
-        ArrayList<Event> completeEventList = new ArrayList<>();
-        for (String eventId : eventIDs) {
-            for (Event fullEvent : eventSet) {
-                if (fullEvent.getId().equals(eventId)) {
-                    completeEventList.add(fullEvent);
-                    break;
+        // Sort the event list based on event IDs using available methods (getEntry, replace)
+        for (int i = 0; i < completeEventList.size() - 1; i++) {
+            for (int j = 0; j < completeEventList.size() - 1 - i; j++) {
+                Event event1 = completeEventList.getEntry(j);
+                Event event2 = completeEventList.getEntry(j + 1);
+
+                // Compare event IDs
+                if (event1.getId().compareTo(event2.getId()) > 0) {
+                    // Swap the events using replace method
+                    completeEventList.replace(j, event2);
+                    completeEventList.replace(j + 1, event1);
                 }
             }
-        }
-
-        // Debug: Print event list
-        System.out.println("---- Debug: Complete Event List ----");
-        for (Event event : completeEventList) {
-            System.out.println("Event ID: " + event.getId() + " | Event Name: " + event.getName());
         }
 
         int totalVolunteers = volunteerMap.size(); // Total number of volunteers
@@ -315,19 +312,11 @@ public class EventManagement {
 
         // Calculate total participants
         int totalParticipants = 0;
-        System.out.println("---- Debug: Calculating total participants ----");
-        for (int count : eventParticipants.values()) {
-            totalParticipants += count;
-            System.out.println("Participant Count: " + count); // Debug: Print participant count for each event
+        for (String eventId : eventParticipants.keySet()) {
+            totalParticipants += eventParticipants.get(eventId);
         }
 
         double averageEventsPerVolunteer = totalVolunteers > 0 ? (double) totalParticipants / totalVolunteers : 0;
-
-        // Debug: Final counts
-        System.out.println("Total Volunteers: " + totalVolunteers);
-        System.out.println("Total Events: " + totalEvents);
-        System.out.println("Total Participants: " + totalParticipants);
-        System.out.printf("Average Events per Volunteer: %.2f%n", averageEventsPerVolunteer);
 
         // Call the boundary method to generate the report
         eventManagementUI.generateEventSummaryReport(completeEventList, eventParticipants, totalVolunteers, totalEvents, averageEventsPerVolunteer);
@@ -380,7 +369,7 @@ public class EventManagement {
 
     public static void main(String[] args) {
         // Passing file paths for volunteer and event data files:  
-        EventManagement eventManagement = new EventManagement("volunteer_event.txt", "Event.txt", "volunteer.txt");
+        EventManagement eventManagement = new EventManagement("volunteer_event.txt", "event.txt", "volunteer.txt");
         eventManagement.runEventManagement();
     }
 }

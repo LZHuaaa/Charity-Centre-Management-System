@@ -43,8 +43,6 @@ public class EventDAO {
                 if (eventData.length == 5) { // Ensure proper data length  
                     Event event = new Event(eventData[0], eventData[1], eventData[2], eventData[3], eventData[4]);
                     events.add(event); // Add event to HashSet  
-                    // Debugging output for each event added  
-                    System.out.println("Loaded Event: " + event.getId() + " - " + event.getName());
                 } else {
                     System.out.println("Invalid data length for line: " + line);
                 }
@@ -52,7 +50,6 @@ public class EventDAO {
         } catch (IOException e) {
             e.printStackTrace(); // Handle any IO exceptions  
         }
-        System.out.println("Total events loaded: " + events.size()); // Print total loaded events  
         return events; // Return loaded events  
     }
 
@@ -97,8 +94,6 @@ public class EventDAO {
                 if (eventData.length == 5) { // Ensure proper data length  
                     Event event = new Event(eventData[0], eventData[1], eventData[2], eventData[3], eventData[4]);
                     eventList.add(event); // Add event to the ArrayList  
-                    // Debugging output for each event added  
-                    System.out.println("Loaded Event into ArrayList: " + event.getId() + " - " + event.getName());
                 } else {
                     System.out.println("Invalid data length for line: " + line);
                 }
@@ -106,7 +101,6 @@ public class EventDAO {
         } catch (IOException e) {
             e.printStackTrace(); // Handle any IO exceptions  
         }
-        System.out.println("Total events loaded into ArrayList: " + eventList.size()); // Print total loaded events  
         return eventList; // Return the populated ArrayList  
     }
 
