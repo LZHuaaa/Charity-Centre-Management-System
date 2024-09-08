@@ -352,7 +352,7 @@ public class VolunteerUI {
                 }
             }
 
-            continueSearching = promptContinue("\nError: Volunteer ID is not found. Do you want to search for events under another volunteer? (yes/no): ");
+            continueSearching = promptContinue("\nDo you want to search for events under another volunteer? (yes/no): ");
         }
     }
 

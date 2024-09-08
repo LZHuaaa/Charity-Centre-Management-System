@@ -3,8 +3,10 @@
  * @author Chia Yuxuan
  */
 package entity;
+import java.util.Objects;  
 
-public class Event {
+public class Event implements Comparable<Event> {
+
     private String eventId;
     private String name;
     private String date;
@@ -26,8 +28,6 @@ public class Event {
         this.eventId = eventId;
     }
 
-
-   
     public String getEventId() {
         return eventId;
     }
@@ -46,5 +46,61 @@ public class Event {
 
     public String getDescription() {
         return description;
+    }
+    
+     public void setId(String id) {  
+        this.eventId = id;  
+    }  
+
+ 
+    public void setName(String name) {  
+        this.name = name;  
+    }  
+
+
+    public void setDate(String date) {  
+        this.date = date;  
+    }  
+
+
+    public void setLocation(String location) {  
+        this.location = location;  
+    }   
+
+    public void setDescription(String description) {  
+        this.description = description;  
+    } 
+
+    @Override
+    public String toString() {
+        return "Event{"
+                + "id='" + eventId + '\''
+                + ", name='" + name + '\''
+                + ", date='" + date + '\''
+                + ", location='" + location + '\''
+                + ", description='" + description + '\''
+                + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        Event event = (Event) obj;
+        return eventId.equals(event.eventId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(eventId);
+    }
+
+    @Override
+    public int compareTo(Event o) {
+        return this.date.compareTo(o.date); // Compare by date  
     }
 }

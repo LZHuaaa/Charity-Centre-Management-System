@@ -1,41 +1,60 @@
-/**
- *
- * @author Lee Zhi Hua
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package adt;
-
-
-public class LinkedList<T> implements ListInterface<T> {
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
+/**
+ *
+ * @author leezh
+ */
+public class LinkedList<T> implements ListInterface<T> , Iterable<T> { 
 
     private Node<T> head;
     private int size;
 
     @Override
+    public boolean remove(T element) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
     public boolean isFull() {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public boolean validateIndex(int index) {
-        throw new UnsupportedOperationException("Not supported yet.");  
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public boolean validateItem(T element) {
-        throw new UnsupportedOperationException("Not supported yet.");  
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
     @Override
     public void checkCapacity() {
-        throw new UnsupportedOperationException("Not supported yet.");  
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void forEach(Consumer<? super T> action) {
+        Iterable.super.forEach(action); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
+    }
+
+    @Override
+    public Spliterator<T> spliterator() {
+        return Iterable.super.spliterator(); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/OverriddenMethodBody
     }
 
     @Override
     public boolean clear() {
-        throw new UnsupportedOperationException("Not supported yet.");  
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
-    // Inner Node class
     private static class Node<T> {
         T data;
         Node<T> next;
@@ -53,9 +72,7 @@ public class LinkedList<T> implements ListInterface<T> {
 
     @Override
     public boolean add(T element) {
-        if (element == null) {
-            return false;
-        }
+        if (element == null) return false;
 
         Node<T> newNode = new Node<>(element);
 
@@ -74,9 +91,7 @@ public class LinkedList<T> implements ListInterface<T> {
 
     @Override
     public boolean add(int index, T newEntry) {
-        if (index < 0 || index > size || newEntry == null) {
-            return false;
-        }
+        if (index < 0 || index > size || newEntry == null) return false;
 
         Node<T> newNode = new Node<>(newEntry);
 
@@ -98,9 +113,7 @@ public class LinkedList<T> implements ListInterface<T> {
 
     @Override
     public T remove(int index) {
-        if (index < 0 || index >= size) {
-            return null;
-        }
+        if (index < 0 || index >= size) return null;
 
         Node<T> current = head;
         if (index == 0) {
@@ -117,38 +130,11 @@ public class LinkedList<T> implements ListInterface<T> {
         size--;
         return current.data;
     }
-
-    @Override
-    public boolean remove(T element) {
-        if (head == null || element == null) {
-            return false;
-        }
-
-        Node<T> current = head;
-        Node<T> previous = null;
-
-        while (current != null) {
-            if (current.data.equals(element)) {
-                if (previous == null) {
-                    head = current.next;  // Remove head
-                } else {
-                    previous.next = current.next;  // Bypass the node to remove
-                }
-                size--;
-                return true;
-            }
-            previous = current;
-            current = current.next;
-        }
-
-        return false;  // Element not found
-    }
+    
 
     @Override
     public T getEntry(int index) {
-        if (index < 0 || index >= size) {
-            return null;
-        }
+        if (index < 0 || index >= size) return null;
 
         Node<T> current = head;
         for (int i = 0; i < index; i++) {
@@ -159,9 +145,7 @@ public class LinkedList<T> implements ListInterface<T> {
 
     @Override
     public T replace(int index, T newEntry) {
-        if (index < 0 || index >= size || newEntry == null) {
-            return null;
-        }
+        if (index < 0 || index >= size || newEntry == null) return null;
 
         Node<T> current = head;
         for (int i = 0; i < index; i++) {
@@ -183,7 +167,7 @@ public class LinkedList<T> implements ListInterface<T> {
         return size;
     }
 
-
+ 
     @Override
     public boolean contains(T anEntry) {
         Node<T> current = head;
@@ -198,9 +182,7 @@ public class LinkedList<T> implements ListInterface<T> {
 
     @Override
     public int indexOf(T element) {
-        if (element == null) {
-            return -1;
-        }
+        if (element == null) return -1;
 
         Node<T> current = head;
         int index = 0;
@@ -218,9 +200,7 @@ public class LinkedList<T> implements ListInterface<T> {
 
     @Override
     public int lastIndexOf(T element) {
-        if (element == null) {
-            return -1;
-        }
+        if (element == null) return -1;
 
         Node<T> current = head;
         int lastIndex = -1;
@@ -252,4 +232,25 @@ public class LinkedList<T> implements ListInterface<T> {
 
         head = previous;
     }
+    @Override  
+    public Iterator<T> iterator() {  
+        return new Iterator<T>() {  
+            private Node<T> current = head;  
+
+            @Override  
+            public boolean hasNext() {  
+                return current != null;  
+            }  
+
+            @Override  
+            public T next() {  
+                if (!hasNext()) {  
+                    throw new IllegalStateException("No more elements");  
+                }  
+                T data = current.data;  
+                current = current.next;  
+                return data;  
+            }  
+        };  
+    }  
 }

@@ -54,7 +54,7 @@ public class DoneeDAO {
     //retrieve donee(array)
     public ListInterface<Donee> retrieveDonees() {
         ListInterface<Donee> doneeList = new ArrayList<>();
-        HashMapInterface<String, Donation> donationMap = retrieveDonations();
+        MapInterface<String, Donation> donationMap = retrieveDonations();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("donee.txt"))) {
             String line;
@@ -89,7 +89,7 @@ public class DoneeDAO {
     //retrieve donee(hashMap)
      public HashMap<String, Donee> loadDoneesIntoMap() {
 
-        HashMapInterface<String, Donation> donationMap = retrieveDonations();
+        MapInterface<String, Donation> donationMap = retrieveDonations();
         HashMap<String, Donee> doneeMap = new HashMap<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("donee.txt"))) {
@@ -122,8 +122,8 @@ public class DoneeDAO {
     }
 
     //retrieve donation(HashMap)
-    public HashMapInterface<String, Donation> retrieveDonations() {
-        HashMapInterface<String, Donation> donationMap = new HashMap<>();
+    public MapInterface<String, Donation> retrieveDonations() {
+        MapInterface<String, Donation> donationMap = new HashMap<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("donation.txt"))) {
             String line;
@@ -178,7 +178,7 @@ public class DoneeDAO {
     //Retrieve Donation(Array)
     public ListInterface<Donation> retrieveDonations(ListInterface<Donee> doneeList) {
         ListInterface<Donation> donationList = new LinkedList<>();
-        HashMapInterface<String, Donation> donationMap = new HashMap<>();
+        MapInterface<String, Donation> donationMap = new HashMap<>();
 
         try (BufferedReader reader = new BufferedReader(new FileReader("donation.txt"))) {
             String line;

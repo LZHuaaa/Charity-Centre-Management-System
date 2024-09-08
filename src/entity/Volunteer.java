@@ -6,8 +6,9 @@ package entity;
 
 import adt.ArrayList;
 import adt.ListInterface;
+import java.util.Objects;
 
-public class Volunteer {
+public class Volunteer implements Comparable<Volunteer>{
     private String volunteerId;
     private String name;
     private String contactNumber;
@@ -21,7 +22,7 @@ public class Volunteer {
         this.email = email;
         this.events = new ArrayList<>(); // Initialize the list of events
     }
-
+    
     public String getVolunteerId() {
         return volunteerId;
     }
@@ -65,4 +66,32 @@ public class Volunteer {
     public void setEvents(ListInterface<Event> assignedEvents) {
         this.events = assignedEvents; // Store the assigned events in the Volunteer object   
     }   
+    
+    @Override  
+    public String toString() {  
+        return "Volunteer{" +  
+                "id='" + volunteerId + '\'' +  
+                ", name='" + name + '\'' +  
+                ", phoneNumber='" + contactNumber + '\'' +  
+                ", email='" + email + '\'' +  
+                '}';  
+    }  
+
+    @Override  
+    public boolean equals(Object obj) {  
+        if (this == obj) return true;  
+        if (obj == null || getClass() != obj.getClass()) return false;  
+        Volunteer volunteer = (Volunteer) obj;  
+        return volunteerId.equals(volunteer.volunteerId);  
+    }  
+
+    @Override  
+    public int hashCode() {  
+        return Objects.hash(volunteerId);  
+    }  
+
+    @Override  
+    public int compareTo(Volunteer o) {  
+        return this.name.compareTo(o.name);  
+    }  
 }

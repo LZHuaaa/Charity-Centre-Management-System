@@ -16,12 +16,24 @@ public class VolunteerDAO {
     private ListInterface<Event> events;
     private final String FILE_NAME = "volunteer.txt";
     private final String ID_PREFIX = "V";
+    private HashSet<Volunteer> volunteers1=new HashSet<>(); // HashSet to store volunteers  
+    private HashMap<String, Volunteer> volunteerMap=new HashMap<>(); // HashMap to map volunteer IDs to Volunteer objects  
+    private final String filePath; // Path to the file where volunteer data is stored  
 
     public VolunteerDAO() {
         volunteers = new ArrayList<>();
         events = new ArrayList<>();
         loadFromFile(); // Load volunteers from the file when the system starts
+        this.filePath = "volunteer.txt"; // Default file path  
+        this.volunteers1 = new HashSet<>(); // Initialize the HashSet  
+        this.volunteerMap = new HashMap<>(); // Initialize the HashMap  
+        loadIntoHashSet(); // Load volunteers from the default file  
     }
+     public VolunteerDAO(String filePath) {  
+        this.filePath = filePath; // Initialize the filePath with the provided one  
+        this.volunteers1 = new HashSet<>(); // Initialize the HashSet  
+        this.volunteerMap = new HashMap<>(); // Initialize the HashMap  
+    } 
 
     public void add(Volunteer volunteer) {
         volunteer.setVolunteerId(generateNewId()); 
@@ -222,4 +234,63 @@ public class VolunteerDAO {
         }
         return null;
     }
+    
+    //kevin
+
+     public HashSet<Volunteer> loadIntoHashSet() {  
+        volunteers1.clear(); // Clear existing volunteers1  
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {  
+            String line;  
+            while ((line = br.readLine()) != null) {  
+                String[] volunteerData = line.split(","); // Split the line by comma and space  
+                if (volunteerData.length == 4) { // Ensure there are enough data fields  
+                    Volunteer volunteer = new Volunteer(volunteerData[0], volunteerData[1], volunteerData[2], volunteerData[3]);  
+                    volunteers1.add(volunteer); // Add the volunteer to the HashSet  
+                }  
+            }  
+        } catch (IOException e) {  
+            e.printStackTrace(); // Handle any IO exceptions  
+        }  
+        return volunteers1; // Return the loaded volunteers1  
+    }  
+
+    // Load volunteers1 into a HashMap from the predefined file  
+    public HashMap<String, Volunteer> loadIntoHashMap() {  
+        volunteerMap.clear(); // Clear existing volunteers1 in the map  
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {  
+            String line;  
+            while ((line = br.readLine()) != null) {  
+                
+                String[] volunteerData = line.split(","); // Split the line by comma and space  
+                if (volunteerData.length == 4) { // Ensure there are enough data fields  
+                    Volunteer volunteer = new Volunteer(volunteerData[0], volunteerData[1], volunteerData[2], volunteerData[3]);  
+                    volunteerMap.put(volunteer.getVolunteerId(), volunteer); // Map volunteer ID to the Volunteer object 
+                }  
+            }  
+        } catch (IOException e) {  
+            e.printStackTrace(); // Handle any IO exceptions  
+        }  
+        return volunteerMap; // Return the populated map of volunteers1  
+    }  
+    
+     public void save() {  
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {  
+            for (Volunteer volunteer : volunteers1) { // Iterate over each volunteer  
+                String line = String.join(",", volunteer.getVolunteerId(), volunteer.getName(), volunteer.getEmail(), volunteer.getContactNumber()); // Construct the line from volunteer fields  
+                bw.write(line); // Write the constructed line to the file  
+                bw.newLine(); // Add a new line  
+            }  
+        } catch (IOException e) {  
+            e.printStackTrace(); // Handle any IO exceptions  
+        }  
+    }  
+
+    // Retrieve volunteers1 into an ArrayList  
+    public ArrayList<Volunteer> retrieveToArrayList() {  
+        ArrayList<Volunteer> volunteerList = new ArrayList<>(); // Create an instance of your custom ArrayList  
+        for (Volunteer volunteer : volunteers1) { // Use a for-each loop to iterate through volunteers1  
+            volunteerList.add(volunteer); // Add each volunteer to the ArrayList  
+        }  
+        return volunteerList; // Return the populated ArrayList  
+    }  
 }
