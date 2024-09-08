@@ -91,31 +91,10 @@ public class HashSet<T> implements SetInterface<T>, Iterable<T> {
         return size == 0;
     }
 
-    private int getIndex(T element) {
+    public int getIndex(T element) {
         return Math.abs(element.hashCode()) % table.length;
     }
     
-    public boolean removeIf(java.util.function.Predicate<? super T> filter) {  
-    boolean removed = false;  
-    for (int i = 0; i < table.length; i++) {  
-        if (table[i] != null) {  
-            Iterator<T> iterator = table[i].iterator();  
-            while (iterator.hasNext()) {  
-                T element = iterator.next();  
-                if (filter.test(element)) {  
-                    iterator.remove(); // Remove element using the iterator  
-                    removed = true;  
-                }  
-            }  
-            // If the bucket becomes empty after removals, set it to null  
-            if (table[i].isEmpty()) {  
-                table[i] = null;  
-            }  
-        }  
-    }  
-    return removed;  
-}  
-
     // Implementing the Iterable interface  
     @Override
     public Iterator<T> iterator() {

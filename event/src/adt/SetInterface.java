@@ -8,7 +8,8 @@ package adt;
  *
  * @author eyong
  */
-public interface SetInterface<T> {
+
+public interface SetInterface<T> extends Iterable<T> {
     boolean add(T element);
     boolean remove(T element);
     boolean contains(T element);

@@ -10,7 +10,7 @@ package adt;
  * @author leezh
  */
 
-public interface ListInterface<T> {
+public interface ListInterface<T> extends Iterable<T>{
 
     boolean add(T element);
 

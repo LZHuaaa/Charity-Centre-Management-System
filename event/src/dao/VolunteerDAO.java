@@ -14,83 +14,68 @@ import java.io.*;
  */
 public class VolunteerDAO {
 
-    private HashSet<Volunteer> volunteers = new HashSet<>(); // HashSet to store volunteers  
-    private HashMap<String, Volunteer> volunteerMap = new HashMap<>(); // HashMap to map volunteer IDs to Volunteer objects  
-    private final String filePath; // Path to the file where volunteer data is stored  
+    private SetInterface<Volunteer> volunteers = new HashSet<>(); // HashSet to store volunteers  
+    private MapInterface<String, Volunteer> volunteerMap = new HashMap<>(); // HashMap to map volunteer IDs to Volunteer objects  
+    private final String filePath; // Path to the file  
 
     public VolunteerDAO() {
-        this.filePath = "volunteer.txt"; // Default file path  
-        this.volunteers = new HashSet<>(); // Initialize the HashSet  
-        this.volunteerMap = new HashMap<>(); // Initialize the HashMap  
-        loadIntoHashSet(); // Load volunteers from the default file  
+        this.filePath = "volunteer.txt"; 
+        this.volunteers = new HashSet<>();
+        this.volunteerMap = new HashMap<>(); 
+        loadIntoHashSet(); 
     }
 
     // Constructor  
     public VolunteerDAO(String filePath) {
-        this.filePath = filePath; // Initialize the filePath with the provided one  
-        this.volunteers = new HashSet<>(); // Initialize the HashSet  
-        this.volunteerMap = new HashMap<>(); // Initialize the HashMap  
+        this.filePath = filePath;   
+        this.volunteers = new HashSet<>(); 
+        this.volunteerMap = new HashMap<>(); 
     }
 
-    // Load volunteers into a HashSet from the predefined file  
-    public HashSet<Volunteer> loadIntoHashSet() {
-        volunteers.clear(); // Clear existing volunteers  
+    // Load volunteers into a HashSet
+    public SetInterface<Volunteer> loadIntoHashSet() {
+        volunteers.clear();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] volunteerData = line.split(", "); // Split the line by comma and space  
-                if (volunteerData.length == 4) { // Ensure there are enough data fields  
+                String[] volunteerData = line.split(", ");   
+                if (volunteerData.length == 4) { 
                     Volunteer volunteer = new Volunteer(volunteerData[0], volunteerData[1], volunteerData[2], volunteerData[3]);
-                    volunteers.add(volunteer); // Add the volunteer to the HashSet  
+                    volunteers.add(volunteer); 
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace(); // Handle any IO exceptions  
+            e.printStackTrace(); 
         }
-        return volunteers; // Return the loaded volunteers  
+        return volunteers; 
     }
 
-    // Load volunteers into a HashMap from the predefined file  
-    public HashMap<String, Volunteer> loadIntoHashMap() {
-        volunteerMap.clear(); // Clear existing volunteers in the map  
+    // Load volunteers into a HashMap
+    public MapInterface<String, Volunteer> loadIntoHashMap() {
+        volunteerMap.clear(); 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] volunteerData = line.split(", "); // Split the line by comma and space  
-                if (volunteerData.length == 4) { // Ensure there are enough data fields  
+                String[] volunteerData = line.split(", ");  
+                if (volunteerData.length == 4) {  
                     Volunteer volunteer = new Volunteer(volunteerData[0], volunteerData[1], volunteerData[2], volunteerData[3]);
-
-                    // Only add the volunteer if it does not already exist in the map
                     if (!volunteerMap.containsKey(volunteer.getId())) {
-                        volunteerMap.put(volunteer.getId(), volunteer); // Map volunteer ID to the Volunteer object 
+                        volunteerMap.put(volunteer.getId(), volunteer); 
                     }
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace(); // Handle any IO exceptions  
+            e.printStackTrace(); 
         }
-        return volunteerMap; // Return the populated map of volunteers  
-    }
-
-    // Save volunteers from HashSet to the predefined file  
-    public void save() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
-            for (Volunteer volunteer : volunteers) { // Iterate over each volunteer  
-                String line = String.join(", ", volunteer.getId(), volunteer.getName(), volunteer.getEmail(), volunteer.getPhone()); // Construct the line from volunteer fields  
-                bw.write(line); // Write the constructed line to the file  
-                bw.newLine(); // Add a new line  
-            }
-        } catch (IOException e) {
-            e.printStackTrace(); // Handle any IO exceptions  
-        }
+        return volunteerMap; 
     }
 
     // Retrieve volunteers into an ArrayList  
-    public ArrayList<Volunteer> retrieveToArrayList() {
-        ArrayList<Volunteer> volunteerList = new ArrayList<>(); // Create an instance of your custom ArrayList  
-        for (Volunteer volunteer : volunteers) { // Use a for-each loop to iterate through volunteers  
-            volunteerList.add(volunteer); // Add each volunteer to the ArrayList  
+    public ListInterface<Volunteer> retrieveToArrayList() {
+        ListInterface<Volunteer> volunteerList = new ArrayList<>();
+        for (Volunteer volunteer : volunteers) { 
+            volunteerList.add(volunteer);  
         }
-        return volunteerList; // Return the populated ArrayList  
+        return volunteerList;
     }
 }

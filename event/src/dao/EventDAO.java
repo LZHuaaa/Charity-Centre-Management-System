@@ -14,27 +14,27 @@ import java.io.*;
 
 public class EventDAO {
 
-    private ArrayList<Event> eventList = new ArrayList<>();
-    private HashSet<Event> events = new HashSet<>(); // Ensure this is declared as a class field  
-    private HashMap<String, Event> eventMap = new HashMap<>(); // HashMap to map event IDs to events  
-    private final String filePath; // Path to the events file  
+    private ListInterface<Event> eventList = new ArrayList<>();
+    private SetInterface<Event> events = new HashSet<>(); 
+    private MapInterface<String, Event> eventMap = new HashMap<>(); 
+    private final String filePath; 
 
     public EventDAO() {
-        this.filePath = "Event.txt"; // Default file path  
-        this.events = new HashSet<>(); // Initialize the HashSet  
-        this.eventMap = new HashMap<>(); // Initialize the HashMap  
-        loadIntoHashSet(); // Load events from the default file  
+        this.filePath = "Event.txt"; 
+        this.events = new HashSet<>(); 
+        this.eventMap = new HashMap<>();   
+        loadIntoHashSet(); 
     }
 
     // Constructor  
     public EventDAO(String filePath) {
-        this.filePath = filePath; // Initialize the filePath with the provided one  
-        this.events = new HashSet<>(); // Initialize the HashSet  
-        this.eventMap = new HashMap<>(); // Initialize the HashMap  
+        this.filePath = filePath; 
+        this.events = new HashSet<>(); 
+        this.eventMap = new HashMap<>(); 
     }
 
-    // Load events into a HashSet from the predefined file  
-    public HashSet<Event> loadIntoHashSet() {
+    // Load events into a HashSet   
+    public SetInterface<Event> loadIntoHashSet() {
         events.clear(); // Clear existing events  
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
@@ -42,66 +42,66 @@ public class EventDAO {
                 String[] eventData = line.split(", ");
                 if (eventData.length == 5) { // Ensure proper data length  
                     Event event = new Event(eventData[0], eventData[1], eventData[2], eventData[3], eventData[4]);
-                    events.add(event); // Add event to HashSet  
+                    events.add(event); 
                 } else {
                     System.out.println("Invalid data length for line: " + line);
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace(); // Handle any IO exceptions  
+            e.printStackTrace(); 
         }
-        return events; // Return loaded events  
+        return events; 
     }
 
-    // Load events into a HashMap from the predefined file  
-    public HashMap<String, Event> loadIntoHashMap() {
-        eventMap.clear(); // Clear existing events in the map  
+    // Load events into a HashMap 
+    public MapInterface<String, Event> loadIntoHashMap() {
+        eventMap.clear(); 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] eventData = line.split(", ");
-                if (eventData.length == 5) { // Ensure proper data length  
+                if (eventData.length == 5) {  
                     Event event = new Event(eventData[0], eventData[1], eventData[2], eventData[3], eventData[4]);
-                    eventMap.put(event.getId(), event); // Map event ID to the event  
+                    eventMap.put(event.getId(), event);  
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace(); // Handle any IO exceptions  
+            e.printStackTrace(); 
         }
-        return eventMap; // Return the populated map  
+        return eventMap; 
     }
 
-    // Save events from HashSet to the predefined file  
-    public void save(HashSet<Event> eventsToSave) {
+    // Save events from HashSet 
+    public void save(SetInterface<Event> eventsToSave) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(filePath))) {
-            for (Event event : eventsToSave) { // Iterate through each event in the provided HashSet  
+            for (Event event : eventsToSave) { 
                 String line = String.join(", ", event.getId(), event.getName(), event.getDate(), event.getLocation(), event.getDescription());
-                bw.write(line); // Write the event line to the file  
-                bw.newLine(); // Add a new line  
+                bw.write(line);
+                bw.newLine(); 
             }
         } catch (IOException e) {
-            e.printStackTrace(); // Handle any IO exceptions  
+            e.printStackTrace(); 
         }
     }
 
     // Retrieve events into an ArrayList  
-    public ArrayList<Event> loadIntoArrayList() {
-        ArrayList<Event> eventList = new ArrayList<>(); // Create an instance of ArrayList  
+    public ListInterface<Event> loadIntoArrayList() {
+        ListInterface<Event> eventList = new ArrayList<>(); 
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] eventData = line.split(", ");
-                if (eventData.length == 5) { // Ensure proper data length  
+                if (eventData.length == 5) { 
                     Event event = new Event(eventData[0], eventData[1], eventData[2], eventData[3], eventData[4]);
-                    eventList.add(event); // Add event to the ArrayList  
+                    eventList.add(event);  
                 } else {
                     System.out.println("Invalid data length for line: " + line);
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace(); // Handle any IO exceptions  
+            e.printStackTrace(); 
         }
-        return eventList; // Return the populated ArrayList  
+        return eventList; 
     }
 
 }
